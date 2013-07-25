@@ -146,7 +146,7 @@ const PROGMEM char usbDescriptorConfiguration[] =
 	(char) 0x81,					// IN endpoint number 1
 	0x03,							// attrib: Interrupt endpoint
 	8, 0,							// maximum packet size
-	USB_CFG_INTR_POLL_INTERVAL,		// in ms
+	USB_CFG_INTR_POLL_INTERVAL,		// must be at least 10ms
 
 
 	//
@@ -179,7 +179,7 @@ const PROGMEM char usbDescriptorConfiguration[] =
 	(char) (0x80 | USB_CFG_EP3_NUMBER),	// IN endpoint number 3
 	0x03,								// attrib: Interrupt endpoint
 	8, 0,								// maximum packet size
-	USB_CFG_INTR_POLL_INTERVAL, 		// in ms
+	USB_CFG_INTR_POLL_INTERVAL, 		// must be at least 10ms
 };
 
 const PROGMEM uint16_t
