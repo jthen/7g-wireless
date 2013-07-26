@@ -17,6 +17,3 @@ bool is_pressed(uint8_t keycode);
 
 // checks if any key is pressed
 bool is_any_key_pressed(void);
-
-void wait_for_all_keys_up();
-void wait_for_key_down();

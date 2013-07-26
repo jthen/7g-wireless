@@ -379,18 +379,3 @@ bool is_any_key_pressed(void)
 	return false;
 }
 
-void wait_for_all_keys_up()
-{
-	do {
-		matrix_scan();
-		_delay_ms(10);
-	} while (is_any_key_pressed());
-}
-
-void wait_for_key_down()
-{
-	do {
-		matrix_scan();
-		_delay_ms(10);
-	} while (!is_any_key_pressed());
-}
