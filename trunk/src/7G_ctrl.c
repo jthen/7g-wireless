@@ -24,6 +24,136 @@
 
 bool process_normal(void)
 {
+	bool waiting_for_all_keys_up = false;
+	bool are_all_keys_up;
+
+	do {
+		wait_for_matrix_change();
+
+		// make a key state report
+		rf_msg_key_state_report_t report;
+		report.msg_type = MT_KEY_STATE;
+		report.modifiers = 0;
+		report.consumer = 0;
+
+		uint8_t num_keys = 0;
+
+		are_all_keys_up = true;
+		
+		if (is_pressed(KC_FUNC))
+		{
+			are_all_keys_up = false;
+			
+			// set the bits of the consumer byte
+			if (is_pressed(KC_F1))		report.consumer |= _BV(FN_MUTE_BIT);
+			if (is_pressed(KC_F2))		report.consumer |= _BV(FN_VOL_DOWN_BIT);
+			if (is_pressed(KC_F3))		report.consumer |= _BV(FN_VOL_UP_BIT);
+			if (is_pressed(KC_F4))		report.consumer |= _BV(FN_PLAY_PAUSE_BIT);
+			if (is_pressed(KC_F5))		report.consumer |= _BV(FN_PREV_TRACK_BIT);
+			if (is_pressed(KC_F6))		report.consumer |= _BV(FN_NEXT_TRACK_BIT);
+
+			if (is_pressed(KC_ESC))
+				waiting_for_all_keys_up = true;
+
+		} else {
+		
+			for (row = 0; row < NUM_ROWS; ++row)
+			{
+				for (col = 0; col < NUM_COLS; ++col)
+				{
+					if (matrix[row] & _BV(col))
+					{
+						are_all_keys_up = false;
+						
+						uint8_t keycode = get_keycode(row, col);
+						
+						if (IS_MOD(keycode))
+							report.modifiers |= _BV(keycode - KC_LCTRL);
+						else if (num_keys < MAX_KEYS)
+							report.keys[num_keys++] = keycode;
+					}
+				}
+			}
+		}
+		
+	} while (waiting_for_all_keys_up  &&  are_all_keys_up);
+
+	uint8_t row, col;
+	static bool waiting_for_all_keys_up = false;
+
+	rf_msg_key_state_report_t report;
+	report.msg_type = MT_KEY_STATE;
+			
+	// make a key state report
+	report.modifiers = 0;
+	report.consumer = 0;
+	uint8_t num_keys = 0;
+
+	bool are_all_keys_up = true;
+	
+	// if the func key is down
+	if (is_pressed(KC_FUNC))
+	{
+		are_all_keys_up = false;
+		
+		// set the bits of the consumer byte
+		if (is_pressed(KC_F1))		report.consumer |= _BV(FN_MUTE_BIT);
+		if (is_pressed(KC_F2))		report.consumer |= _BV(FN_VOL_DOWN_BIT);
+		if (is_pressed(KC_F3))		report.consumer |= _BV(FN_VOL_UP_BIT);
+		if (is_pressed(KC_F4))		report.consumer |= _BV(FN_PLAY_PAUSE_BIT);
+		if (is_pressed(KC_F5))		report.consumer |= _BV(FN_PREV_TRACK_BIT);
+		if (is_pressed(KC_F6))		report.consumer |= _BV(FN_NEXT_TRACK_BIT);
+
+		if (is_pressed(KC_ESC))
+			waiting_for_all_keys_up = true;
+
+	} else {
+	
+		for (row = 0; row < NUM_ROWS; ++row)
+		{
+			for (col = 0; col < NUM_COLS; ++col)
+			{
+				if (matrix[row] & _BV(col))
+				{
+					are_all_keys_up = false;
+					
+					uint8_t keycode = get_keycode(row, col);
+					
+					if (IS_MOD(keycode))
+						report.modifiers |= _BV(keycode - KC_LCTRL);
+					else if (num_keys < MAX_KEYS)
+						report.keys[num_keys++] = keycode;
+				}
+			}
+		}
+	}
+	
+	// send the report until we get an ACK
+	bool is_sent;
+	const uint8_t MAX_DROP_CNT = 10;
+	uint8_t drop_cnt = 0;
+	do {
+		is_sent = rf_ctrl_send_message(&report, num_keys + 3);
+		if (!is_sent)
+			++drop_cnt;
+
+		// flush the ACK payloads
+		rf_ctrl_process_ack_payloads(NULL, NULL);
+
+	} while (!is_sent  &&  drop_cnt < MAX_DROP_CNT);
+
+	// change the state if no keys are down
+	if (are_all_keys_up  &&  waiting_for_all_keys_up)
+	{
+		waiting_for_all_keys_up = false;
+		return true;
+	}
+	
+	return false;
+}
+
+bool process_normal_old(void)
+{
 	uint8_t row, col;
 	static bool waiting_for_all_keys_up = false;
 
@@ -178,7 +308,7 @@ uint16_t get_battery_voltage(void)
 {
 	//power_adc_enable();
 	
-	ADMUX = _B0(REFS1) | _B1(REFS0)	// reference AVCC
+	ADMUX = _B0(REFS1) | _B0(REFS0)	// reference AVCC
 			| _B1(ADLAR)			// left adjust ADC
 			| 0b11110;				// measure 1.1v internal reference
 			
@@ -246,9 +376,9 @@ void process_menu(void)
 	char string_buff[10];
 	while (!exit_menu)
 	{
-		send_text(PSTR("\x01this is the 7G wireless config menu.\n"
-						"current battery voltage is "), true, false);
-						
+		send_text(PSTR("\x017G wireless config menu\n"
+						"battery voltage="), true, false);
+
 		get_battery_voltage_str(string_buff);
 		send_text(string_buff, false, false);
 		
@@ -275,7 +405,7 @@ void process_menu(void)
 
 		if (keycode == KC_F1)
 		{
-			send_text(PSTR("F1 0dBm\nF2 -6dBm\nF3 -12dBm\nF4 -18dBm\n"), true, false);
+			send_text(PSTR("select power:\nF1 0dBm\nF2 -6dBm\nF3 -12dBm\nF4 -18dBm\n"), true, false);
 			
 			while (1)
 			{
@@ -341,13 +471,13 @@ int main(void)
 #endif
 	
 	uint8_t sleep_prescaler = SLEEP_PRESCALER_256;
-	uint8_t sleep_cycle_dur_ms = set_sleep_prescaler(sleep_prescaler);
+	uint8_t sleep_cycle_dur_ms = 0;	//set_sleep_prescaler(sleep_prescaler);
 	uint8_t idle_cnt = 0;		// number of main loop iterations that had no changes
-	
+
 	sei();	// enable interrupts
 
 	bool has_changed;
-	
+
 	for (;;)
 	{
 		// the CPU has to be in active mode for the LED's PWM Timer0 to work
@@ -370,7 +500,7 @@ int main(void)
 			if (sleep_prescaler == SLEEP_PRESCALER_1024)
 			{
 				sleep_prescaler = SLEEP_PRESCALER_256;
-				sleep_cycle_dur_ms = set_sleep_prescaler(sleep_prescaler);
+				sleep_cycle_dur_ms = 0;//set_sleep_prescaler(sleep_prescaler);
 			}
 			
 		} else {
@@ -381,7 +511,7 @@ int main(void)
 				if (sleep_prescaler == SLEEP_PRESCALER_256)
 				{
 					sleep_prescaler = SLEEP_PRESCALER_1024;
-					sleep_cycle_dur_ms = set_sleep_prescaler(sleep_prescaler);
+					sleep_cycle_dur_ms = 0;//set_sleep_prescaler(sleep_prescaler);
 				}
 			} else {
 				++idle_cnt;

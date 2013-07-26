@@ -14037,6 +14037,7 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 <part name="AVR_JTAG" library="KileParts" deviceset="AVR-JTAG" device=""/>
 <part name="P+5" library="SparkFun" deviceset="VCC" device=""/>
 <part name="GND4" library="SparkFun" deviceset="GND" device=""/>
+<part name="GND8" library="SparkFun" deviceset="GND" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -14072,13 +14073,14 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 <instance part="UART" gate="1" x="43.18" y="-25.4" rot="MR180"/>
 <instance part="P+10" gate="1" x="63.5" y="-20.32"/>
 <instance part="GND7" gate="1" x="63.5" y="-35.56"/>
-<instance part="C5" gate="G$1" x="157.48" y="35.56"/>
+<instance part="C5" gate="G$1" x="142.24" y="58.42" rot="R270"/>
 <instance part="R2" gate="G$1" x="132.08" y="-7.62"/>
 <instance part="R3" gate="G$1" x="114.3" y="-2.54"/>
 <instance part="R4" gate="G$1" x="121.92" y="-5.08"/>
 <instance part="AVR_JTAG" gate="G$1" x="-68.58" y="10.16" rot="R180"/>
 <instance part="P+5" gate="1" x="-43.18" y="12.7"/>
 <instance part="GND4" gate="1" x="-45.72" y="25.4" rot="R90"/>
+<instance part="GND8" gate="1" x="129.54" y="50.8"/>
 </instances>
 <busses>
 <bus name="H28,H27,H25,H22,H21,H20,H19,H18">
@@ -14232,14 +14234,9 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 <pinref part="GND5" gate="1" pin="GND"/>
 </segment>
 <segment>
-<pinref part="LP2980" gate="G$1" pin="GND"/>
 <pinref part="GND6" gate="1" pin="GND"/>
-<wire x1="170.18" y1="30.48" x2="170.18" y2="27.94" width="0.1524" layer="91"/>
-<pinref part="C5" gate="G$1" pin="-"/>
-<wire x1="170.18" y1="27.94" x2="170.18" y2="25.4" width="0.1524" layer="91"/>
-<wire x1="157.48" y1="30.48" x2="157.48" y2="27.94" width="0.1524" layer="91"/>
-<wire x1="157.48" y1="27.94" x2="170.18" y2="27.94" width="0.1524" layer="91"/>
-<junction x="170.18" y="27.94"/>
+<pinref part="LP2980" gate="G$1" pin="GND"/>
+<wire x1="170.18" y1="30.48" x2="170.18" y2="25.4" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="UART" gate="1" pin="RX"/>
@@ -14257,6 +14254,12 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 <wire x1="-60.96" y1="15.24" x2="-58.42" y2="15.24" width="0.1524" layer="91"/>
 <wire x1="-58.42" y1="15.24" x2="-58.42" y2="17.78" width="0.1524" layer="91"/>
 <junction x="-58.42" y="17.78"/>
+</segment>
+<segment>
+<pinref part="C5" gate="G$1" pin="-"/>
+<wire x1="137.16" y1="58.42" x2="129.54" y2="58.42" width="0.1524" layer="91"/>
+<wire x1="129.54" y1="58.42" x2="129.54" y2="53.34" width="0.1524" layer="91"/>
+<pinref part="GND8" gate="1" pin="GND"/>
 </segment>
 </net>
 <net name="MOSI" class="0">
@@ -14380,6 +14383,9 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 <wire x1="149.86" y1="58.42" x2="152.4" y2="58.42" width="0.1524" layer="91"/>
 <pinref part="SJ1" gate="G$1" pin="2"/>
 <wire x1="149.86" y1="58.42" x2="149.86" y2="48.26" width="0.1524" layer="91"/>
+<pinref part="C5" gate="G$1" pin="+"/>
+<wire x1="144.78" y1="58.42" x2="149.86" y2="58.42" width="0.1524" layer="91"/>
+<junction x="149.86" y="58.42"/>
 </segment>
 </net>
 <net name="LEDSCRL" class="0">
@@ -14407,11 +14413,7 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 <segment>
 <pinref part="SJ1" gate="G$1" pin="1"/>
 <pinref part="LP2980" gate="G$1" pin="VOUT"/>
-<wire x1="154.94" y1="43.18" x2="157.48" y2="43.18" width="0.1524" layer="91"/>
-<pinref part="C5" gate="G$1" pin="+"/>
-<wire x1="157.48" y1="43.18" x2="160.02" y2="43.18" width="0.1524" layer="91"/>
-<wire x1="157.48" y1="43.18" x2="157.48" y2="38.1" width="0.1524" layer="91"/>
-<junction x="157.48" y="43.18"/>
+<wire x1="154.94" y1="43.18" x2="160.02" y2="43.18" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$29" class="0">
@@ -14727,6 +14729,12 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 <pinref part="ATMEGA169PV" gate="G$1" pin="(DI/SDA/PCINT5)PE5"/>
 <wire x1="53.34" y1="2.54" x2="60.96" y2="2.54" width="0.1524" layer="91"/>
 <label x="55.88" y="2.54" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="AREF" class="0">
+<segment>
+<pinref part="ATMEGA169PV" gate="G$1" pin="AREF"/>
+<wire x1="-7.62" y1="83.82" x2="-15.24" y2="83.82" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>

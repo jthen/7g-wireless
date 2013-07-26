@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <avr/io.h>
 #include <avr/power.h>
@@ -38,3 +39,14 @@ void init_serial(void)
 
     stdout = &mystdout; // Required for printf init
 }
+
+#ifdef DBGPRINT
+
+void dprinti(const uint16_t i)
+{
+	char string_buff[10];
+	itoa(i, string_buff, 10);
+	puts(string_buff);
+}
+
+#endif

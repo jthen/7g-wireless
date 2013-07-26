@@ -1,19 +1,30 @@
 #pragma once
 
-#define SLEEP_PRESCALER_64		7
-#define SLEEP_PRESCALER_128		8
-#define SLEEP_PRESCALER_256		9
-#define SLEEP_PRESCALER_1024	11
+enum timer2_prescaler {
+
+SLEEP_PRESCALER_64		= _BV(CS22),
+SLEEP_PRESCALER_128		= _BV(CS22) | _BV(CS20),
+SLEEP_PRESCALER_256		= _BV(CS22) | _BV(CS21),
+SLEEP_PRESCALER_1024	= _BV(CS22) | _BV(CS21) | _BV(CS20),
+
+};
+
 
 // sets the default prescaler and inits the hardware
 void init_sleep(void);
 
-// returns the number of milliseconds one sleep cycle lasts
-uint8_t set_sleep_prescaler(const uint8_t prescaler);
-
-// sleep for num_cycles
-void goto_sleep(uint8_t num_cycles);
+// sleep for for a variable amount of time
+// the time to sleep depends on time since last matrix change
+void sleep_dynamic(void);
 
 // sleep for the number of Timer0 counter cycles with a 64 prescaler
 // This will be sleep_cnt*17.36us on a 3.6864MHz F_CPU
-void goto_sleep_short(uint8_t sleep_cnt);
+void sleep_exact(uint8_t sleep_cnt);
+
+void wait_for_all_keys_up(void);
+void wait_for_key_down(void);
+void wait_for_matrix_change(void);
+
+
+//uint8_t set_sleep_prescaler(const uint8_t prescaler);
+void goto_sleep(uint8_t num_cycles);

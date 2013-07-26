@@ -88,11 +88,13 @@ bool rf_ctrl_send_message(const void* buff, const uint8_t num_bytes)
 		loop_until_bit_is_clear(PIN(NRF_IRQ_PORT), NRF_IRQ_BIT);
 	} else {
 		// go to low power while the nRF does it's magic
-		goto_sleep_short(50);		// this will be about 50*17.36us=868us
+		//goto_sleep_short(50);		// this will be about 50*17.36us=868us
+		goto_sleep(1);		// this will be about 50*17.36us=868us
 		
 		// wait for the IRQ pin to go low
 		while (PIN(NRF_IRQ_PORT) & _BV(NRF_IRQ_BIT))
-			goto_sleep_short(10);	// this will be about 10*17.36us=173.6us
+			//goto_sleep_short(10);	// this will be about 10*17.36us=173.6us
+			goto_sleep(1);	// this will be about 10*17.36us=173.6us
 	}
 
 	nRF_CE_lo();
