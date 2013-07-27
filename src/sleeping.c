@@ -11,82 +11,78 @@
 #include "utils.h"
 #include "avr_serial.h"
 
-// sleep one TCNT2 overflow cycle
-void sleep_ovf()
+uint16_t tcnt2_lword = 0;
+uint16_t tcnt2_hword = 0;
+
+void add_ticks(const uint8_t ticks)
 {
-	//SetBit(PORTE, 0);
-	set_sleep_mode(SLEEP_MODE_IDLE);
-	sleep_enable();
-	TCNT2 = 0;			// init the wake-up counter
-	sleep_mode();		// go to sleep
-	//ClrBit(PORTE, 0);
-	sleep_disable();
+	// mind the overflow
+	if (ticks > 0xffff - tcnt2_lword)
+		tcnt2_hword++;
+		
+	tcnt2_lword += ticks;
 }
 
-typedef struct
-{
-	uint8_t		prescaler_mask;	// the prescaler bits for the TCCR2A register
-	uint16_t	tcnt_dur_10ns;	// unit is ten nano sec
-	uint16_t	ovf_dur_10us;	// unit is ten micro sec
-	uint16_t	wait_s;			// how long to wait in this state before increasing prescaler
-} prescalers_t;
+// wake from sleep interrupt
+ISR(TIMER2_OVF_vect)
+{}
 
-const __flash prescalers_t prescalers[4] = 
+// sleep for sleep_ticks number of TCNT2 ticks
+void sleep_ticks(uint8_t ticks)
 {
-	{ _BV(CS22),                          1736,  444,   1000},	// TCNT= 17.36us  OVF= 4.44ms
-	{ _BV(CS22) | _BV(CS20),              3472,  889,   2000},	// TCNT= 34.72us  OVF= 8.89ms  
-	{ _BV(CS22) | _BV(CS21),              6944, 1778,   3000},	// TCNT= 69.44us  OVF=17.78ms
-	{ _BV(CS22) | _BV(CS21) | _BV(CS20), 27778, 7111,   4000},	// TCNT=277.78us  OVF=71.11ms
-};
+SetBit(PORTE, 1);
 
-#define MIN_PRESCALER_NDX		0
-#define MAX_PRESCALER_NDX		3
-
-static uint16_t sleep_counter = 0;
-static uint8_t prescaler_ndx = MIN_PRESCALER_NDX;
-	
-void set_sleep_prescaler(void)
-{
-	// config the wake-up timer
-	TCCR2A = _BV(WGM21) | _BV(WGM20)	// CTC mode
-				| prescalers[prescaler_ndx].prescaler_mask;
+	if (are_leds_on())
+	{
+		add_ticks(ticks);
+		while (ticks--)
+			_delay_us(277.78);
+	} else {
+		sleep_enable();
+		add_ticks(TCNT2);
+		TCNT2 = 0xff - ticks;		// set the sleep duration
+		add_ticks(ticks);
+		sleep_mode();				// go to sleep
+		sleep_disable();
+	}
+ClrBit(PORTE, 1);
 }
 
 void init_sleep(void)
 {
-	set_sleep_prescaler();
+	set_sleep_mode(SLEEP_MODE_IDLE);
+	
+	// config the wake-up timer
+	TCCR2A = _BV(WGM21) | _BV(WGM20)	// CTC mode
+				| _BV(CS22) | _BV(CS21) | _BV(CS20);	// 1024 prescaler
+														// TCNT=277.78us  OVF=71.11ms
 
 	TIMSK2 = _BV(TOIE2);	// interrupt on overflow
 }
 
+uint16_t dyn_sleep_ticks = 0;
+uint8_t sleep_ticks_prescaler = 0;
+
+#define MIN_SLEEP_TICKS		0x01
+#define MAX_SLEEP_TICKS		0xff
+
 void sleep_dynamic(void)
 {
-	// if we've waited enough in this prescaler
-	if (prescaler_ndx < MAX_PRESCALER_NDX)
+	sleep_ticks_prescaler ++;
+	
+	if (sleep_ticks_prescaler == 4)
 	{
-		uint32_t time_in_prescaler_ms = 
-			((uint32_t) sleep_counter * prescalers[prescaler_ndx].ovf_dur_10us) / 100;
-			
-		if (time_in_prescaler_ms > prescalers[prescaler_ndx].wait_s)
-		{
-			++prescaler_ndx;
-			set_sleep_prescaler();
-			sleep_counter = 0;
-		}
+		sleep_ticks_prescaler = 0;
+		if (dyn_sleep_ticks < MAX_SLEEP_TICKS)
+			dyn_sleep_ticks ++;
 	}
 
-	sleep_ovf();
-
-	// mind the overfow
-	if (sleep_counter < 0xffff)
-		++sleep_counter;
+	sleep_ticks(dyn_sleep_ticks);
 }
 
 void sleep_reset(void)
 {
-	sleep_counter = 0;
-	prescaler_ndx = MIN_PRESCALER_NDX;
-	set_sleep_prescaler();
+	dyn_sleep_ticks = MIN_SLEEP_TICKS;
 }
 
 void wait_for_all_keys_up(void)
@@ -113,55 +109,3 @@ void wait_for_matrix_change(void)
 	while (!matrix_scan())
 		sleep_dynamic();
 }
-
-// wake from sleep interrupt
-ISR(TIMER2_OVF_vect)
-{}
-
-// returns the rounded duration of a sleep cycle in milliseconds
-void goto_sleep(uint8_t num_cycles)
-{
-	// set the sleep mode
-	set_sleep_mode(SLEEP_MODE_PWR_SAVE);
-	
-	sleep_enable();
-
-	// init the wake-up counter
-	TCNT2 = 0;
-	
-	// go to sleep for num_cycles
-	while (num_cycles--)
-		sleep_mode();
-
-	// datasheet recommends this
-	sleep_disable();
-}
-
-/*
-void sleep_exact(uint8_t sleep_cnt)
-{
-	// remember the prescaler
-	uint8_t save_TCCR2A = TCCR2A;
-	
-	// set the 64 prescaler
-	TCCR2A = _BV(WGM21) | _BV(WGM20)	// CTC mode
-				| _BV(CS22);			// prescaler 64
-	
-	// set the sleep mode
-	set_sleep_mode(SLEEP_MODE_PWR_SAVE);
-	
-	sleep_enable();
-
-	// set the duration of sleep
-	TCNT2 = -sleep_cnt;
-	
-	// now go to sleep
-	sleep_mode();
-
-	// datasheet recommends this
-	sleep_disable();
-	
-	// restore the old prescaler
-	TCCR2A = save_TCCR2A;
-}
-*/

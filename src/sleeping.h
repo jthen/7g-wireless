@@ -19,12 +19,8 @@ void sleep_dynamic(void);
 
 // sleep for the number of Timer0 counter cycles with a 64 prescaler
 // This will be sleep_cnt*17.36us on a 3.6864MHz F_CPU
-void sleep_exact(uint8_t sleep_cnt);
+void sleep_ticks(uint8_t sleep_cnt);
 
 void wait_for_all_keys_up(void);
 void wait_for_key_down(void);
 void wait_for_matrix_change(void);
-
-
-//uint8_t set_sleep_prescaler(const uint8_t prescaler);
-void goto_sleep(uint8_t num_cycles);
