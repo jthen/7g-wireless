@@ -22,7 +22,7 @@
 #include "sleeping.h"
 #include "ctrl_settings.h"
 
-bool process_normal(void)
+void process_normal(void)
 {
 	bool waiting_for_all_keys_up = false;
 	bool are_all_keys_up;
@@ -57,6 +57,7 @@ bool process_normal(void)
 
 		} else {
 		
+			uint8_t row, col;
 			for (row = 0; row < NUM_ROWS; ++row)
 			{
 				for (col = 0; col < NUM_COLS; ++col)
@@ -75,157 +76,22 @@ bool process_normal(void)
 				}
 			}
 		}
+
+		// send the report and wait for ACK
+		bool is_sent;
+		const uint8_t MAX_DROP_CNT = 10;
+		uint8_t drop_cnt = 0;
+		do {
+			is_sent = rf_ctrl_send_message(&report, num_keys + 3);
+			if (!is_sent)
+				++drop_cnt;
+
+			// flush the ACK payloads
+			rf_ctrl_process_ack_payloads(NULL, NULL);
+
+		} while (!is_sent  &&  drop_cnt < MAX_DROP_CNT);
 		
-	} while (waiting_for_all_keys_up  &&  are_all_keys_up);
-
-	uint8_t row, col;
-	static bool waiting_for_all_keys_up = false;
-
-	rf_msg_key_state_report_t report;
-	report.msg_type = MT_KEY_STATE;
-			
-	// make a key state report
-	report.modifiers = 0;
-	report.consumer = 0;
-	uint8_t num_keys = 0;
-
-	bool are_all_keys_up = true;
-	
-	// if the func key is down
-	if (is_pressed(KC_FUNC))
-	{
-		are_all_keys_up = false;
-		
-		// set the bits of the consumer byte
-		if (is_pressed(KC_F1))		report.consumer |= _BV(FN_MUTE_BIT);
-		if (is_pressed(KC_F2))		report.consumer |= _BV(FN_VOL_DOWN_BIT);
-		if (is_pressed(KC_F3))		report.consumer |= _BV(FN_VOL_UP_BIT);
-		if (is_pressed(KC_F4))		report.consumer |= _BV(FN_PLAY_PAUSE_BIT);
-		if (is_pressed(KC_F5))		report.consumer |= _BV(FN_PREV_TRACK_BIT);
-		if (is_pressed(KC_F6))		report.consumer |= _BV(FN_NEXT_TRACK_BIT);
-
-		if (is_pressed(KC_ESC))
-			waiting_for_all_keys_up = true;
-
-	} else {
-	
-		for (row = 0; row < NUM_ROWS; ++row)
-		{
-			for (col = 0; col < NUM_COLS; ++col)
-			{
-				if (matrix[row] & _BV(col))
-				{
-					are_all_keys_up = false;
-					
-					uint8_t keycode = get_keycode(row, col);
-					
-					if (IS_MOD(keycode))
-						report.modifiers |= _BV(keycode - KC_LCTRL);
-					else if (num_keys < MAX_KEYS)
-						report.keys[num_keys++] = keycode;
-				}
-			}
-		}
-	}
-	
-	// send the report until we get an ACK
-	bool is_sent;
-	const uint8_t MAX_DROP_CNT = 10;
-	uint8_t drop_cnt = 0;
-	do {
-		is_sent = rf_ctrl_send_message(&report, num_keys + 3);
-		if (!is_sent)
-			++drop_cnt;
-
-		// flush the ACK payloads
-		rf_ctrl_process_ack_payloads(NULL, NULL);
-
-	} while (!is_sent  &&  drop_cnt < MAX_DROP_CNT);
-
-	// change the state if no keys are down
-	if (are_all_keys_up  &&  waiting_for_all_keys_up)
-	{
-		waiting_for_all_keys_up = false;
-		return true;
-	}
-	
-	return false;
-}
-
-bool process_normal_old(void)
-{
-	uint8_t row, col;
-	static bool waiting_for_all_keys_up = false;
-
-	rf_msg_key_state_report_t report;
-	report.msg_type = MT_KEY_STATE;
-			
-	// make a key state report
-	report.modifiers = 0;
-	report.consumer = 0;
-	uint8_t num_keys = 0;
-
-	bool are_all_keys_up = true;
-	
-	// if the func key is down
-	if (is_pressed(KC_FUNC))
-	{
-		are_all_keys_up = false;
-		
-		// set the bits of the consumer byte
-		if (is_pressed(KC_F1))		report.consumer |= _BV(FN_MUTE_BIT);
-		if (is_pressed(KC_F2))		report.consumer |= _BV(FN_VOL_DOWN_BIT);
-		if (is_pressed(KC_F3))		report.consumer |= _BV(FN_VOL_UP_BIT);
-		if (is_pressed(KC_F4))		report.consumer |= _BV(FN_PLAY_PAUSE_BIT);
-		if (is_pressed(KC_F5))		report.consumer |= _BV(FN_PREV_TRACK_BIT);
-		if (is_pressed(KC_F6))		report.consumer |= _BV(FN_NEXT_TRACK_BIT);
-
-		if (is_pressed(KC_ESC))
-			waiting_for_all_keys_up = true;
-
-	} else {
-	
-		for (row = 0; row < NUM_ROWS; ++row)
-		{
-			for (col = 0; col < NUM_COLS; ++col)
-			{
-				if (matrix[row] & _BV(col))
-				{
-					are_all_keys_up = false;
-					
-					uint8_t keycode = get_keycode(row, col);
-					
-					if (IS_MOD(keycode))
-						report.modifiers |= _BV(keycode - KC_LCTRL);
-					else if (num_keys < MAX_KEYS)
-						report.keys[num_keys++] = keycode;
-				}
-			}
-		}
-	}
-	
-	// send the report until we get an ACK
-	bool is_sent;
-	const uint8_t MAX_DROP_CNT = 10;
-	uint8_t drop_cnt = 0;
-	do {
-		is_sent = rf_ctrl_send_message(&report, num_keys + 3);
-		if (!is_sent)
-			++drop_cnt;
-
-		// flush the ACK payloads
-		rf_ctrl_process_ack_payloads(NULL, NULL);
-
-	} while (!is_sent  &&  drop_cnt < MAX_DROP_CNT);
-
-	// change the state if no keys are down
-	if (are_all_keys_up  &&  waiting_for_all_keys_up)
-	{
-		waiting_for_all_keys_up = false;
-		return true;
-	}
-	
-	return false;
+	} while (!waiting_for_all_keys_up  ||  are_all_keys_up);
 }
 
 void send_text(const char* msg, bool is_flash, bool wait_for_finish)
@@ -245,9 +111,6 @@ void send_text(const char* msg, bool is_flash, bool wait_for_finish)
 	uint8_t msg_bytes_free;
 	rf_ctrl_process_ack_payloads(NULL, NULL);
 
-	dprintf("-------- send_text=%i\n", is_flash ? strlen_P(msg) : strlen(msg));
-	dprintf("asd");
-	
 	// send the message in chunks of MAX_TEXT_LEN
 	uint16_t msglen = is_flash ? strlen_P(msg) : strlen(msg);
 	uint8_t chunklen;
@@ -272,13 +135,9 @@ void send_text(const char* msg, bool is_flash, bool wait_for_finish)
 
 			rf_ctrl_process_ack_payloads(&msg_bytes_free, NULL);
 			
-			//printf("msg_free=%i\n", msg_bytes_free);
-
 			if (msg_bytes_free > chunklen + 1)
 				break;
 		}
-		
-		//printf("sending %i bytes; msglen=%i\n", chunklen, msglen);
 		
 		// send the message
 		rf_ctrl_send_message(&txt_msg, chunklen + 1);
@@ -298,8 +157,6 @@ void send_text(const char* msg, bool is_flash, bool wait_for_finish)
 			rf_ctrl_process_ack_payloads(&msg_bytes_free, &msg_bytes_capacity);
 		} while (msg_bytes_free == 0  ||  msg_bytes_free != msg_bytes_capacity);
 	}
-	
-	//puts("------- msg_sent");
 }
 
 // returns the battery voltage in 10mV units
@@ -456,6 +313,9 @@ void init_hw(void)
 	DDRE = 0;	PORTE = 0xff;
 	DDRF = 0;	PORTF = 0xff;
 	DDRG = 0;	PORTG = 0xff;
+	
+	DDRE = _BV(0) | _BV(1);	// !!!
+	PORTE = 0;
 }
 
 int main(void)
@@ -470,53 +330,13 @@ int main(void)
 	init_serial();
 #endif
 	
-	uint8_t sleep_prescaler = SLEEP_PRESCALER_256;
-	uint8_t sleep_cycle_dur_ms = 0;	//set_sleep_prescaler(sleep_prescaler);
-	uint8_t idle_cnt = 0;		// number of main loop iterations that had no changes
-
 	sei();	// enable interrupts
 
-	bool has_changed;
-
+	dprintf("i live...\n");	
 	for (;;)
 	{
-		// the CPU has to be in active mode for the LED's PWM Timer0 to work
-		// so, if the LEDs are active we have to call _delay_ms() instead of goto_sleep()
-		if (are_leds_on())
-			_delay_ms(4);
-		else
-			goto_sleep(1);
-
-		has_changed = matrix_scan();
-
-		if (has_changed)
-		{
-			if (process_normal())
-				process_menu();
-
-			idle_cnt = 0;		// reset the idle counter
-
-			// move to a faster sleep prescaler if needed
-			if (sleep_prescaler == SLEEP_PRESCALER_1024)
-			{
-				sleep_prescaler = SLEEP_PRESCALER_256;
-				sleep_cycle_dur_ms = 0;//set_sleep_prescaler(sleep_prescaler);
-			}
-			
-		} else {
-		
-			// move to a higher sleep prescaler if nothing has been changed in a while
-			if (sleep_cycle_dur_ms * idle_cnt > 30000)		// more than 30 seconds
-			{
-				if (sleep_prescaler == SLEEP_PRESCALER_256)
-				{
-					sleep_prescaler = SLEEP_PRESCALER_1024;
-					sleep_cycle_dur_ms = 0;//set_sleep_prescaler(sleep_prescaler);
-				}
-			} else {
-				++idle_cnt;
-			}
-		}
+		process_normal();
+		//process_menu();
 	}
 
 	return 0;

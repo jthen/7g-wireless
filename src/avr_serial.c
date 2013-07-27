@@ -1,10 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 #include <avr/io.h>
 #include <avr/power.h>
+#include <avr/pgmspace.h>
 
 #include "avr_serial.h"
+#include "hw_setup.h"
 
 #define BAUD 57600
 #include <util/setbaud.h>
@@ -35,18 +38,24 @@ void init_serial(void)
     // USART Baud rate:
     UBRR0H = UBRRH_VALUE;
     UBRR0L = UBRRL_VALUE;
-    UCSR0B = _BV(RXEN0) | _BV(TXEN0);
+    UCSR0B = _BV(TXEN0) /* | _BV(RXEN0) */ ;
 
-    stdout = &mystdout; // Required for printf init
+    stdout = &mystdout;
 }
 
-#ifdef DBGPRINT
-
-void dprinti(const uint16_t i)
+void printi(uint32_t i)
 {
-	char string_buff[10];
-	itoa(i, string_buff, 10);
-	puts(string_buff);
+	char buff[11];
+	char* start = buff + 9;
+	buff[9] = '0';
+	buff[10] = '\0';
+	uint8_t cnt;
+	for (cnt = 9; cnt <= 9  &&  i; --cnt)
+	{
+		buff[cnt] = '0' + i % 10;
+		if (buff[cnt] != '0')
+			start = buff + cnt;
+		i /= 10;
+	}
+	puts(start);
 }
-
-#endif

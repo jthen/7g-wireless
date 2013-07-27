@@ -10,16 +10,16 @@ FUSEL   = 0xfd
 FUSEX   = 0xff
 
 CFLAGS  = -I. -Wall -Os -flto
-CFLAGS += -DDBGPRINT
+#CFLAGS += -DDBGPRINT
 
 LFLAGS  = -Wl,--relax -flto
 # LFLAGS += -u vfprintf -lprintf_min
 
 COMPILE = avr-gcc -mmcu=$(DEVICE) -DF_CPU=$(F_CPU) $(CFLAGS)
 
+OBJECTS = $(TARGET).o nRF24L01.o matrix.o led.o rf_ctrl.o rf_addr.o sleeping.o ctrl_settings.o
 # avr_serial.c contains debugging helper functions which should
 # not be included in the final version
-OBJECTS = $(TARGET).o nRF24L01.o matrix.o led.o rf_ctrl.o rf_addr.o sleeping.o ctrl_settings.o
 OBJECTS += avr_serial.o
 
 hex: $(TARGET).hex
