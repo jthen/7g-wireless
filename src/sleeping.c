@@ -36,7 +36,7 @@ const __flash prescalers_t prescalers[4] =
 	{ _BV(CS22),                          1736,  444,   1000},	// TCNT= 17.36us  OVF= 4.44ms
 	{ _BV(CS22) | _BV(CS20),              3472,  889,   2000},	// TCNT= 34.72us  OVF= 8.89ms  
 	{ _BV(CS22) | _BV(CS21),              6944, 1778,   3000},	// TCNT= 69.44us  OVF=17.78ms
-	{ _BV(CS22) | _BV(CS21) | _BV(CS20), 27778, 7111,   2},	// TCNT=277.78us  OVF=71.11ms
+	{ _BV(CS22) | _BV(CS21) | _BV(CS20), 27778, 7111,   4000},	// TCNT=277.78us  OVF=71.11ms
 };
 
 #define MIN_PRESCALER_NDX		0
@@ -67,16 +67,12 @@ void sleep_dynamic(void)
 		uint32_t time_in_prescaler_ms = 
 			((uint32_t) sleep_counter * prescalers[prescaler_ndx].ovf_dur_10us) / 100;
 			
-	SetBit(PORTE, 0);
 		if (time_in_prescaler_ms > prescalers[prescaler_ndx].wait_s)
 		{
-	SetBit(PORTE, 1);
 			++prescaler_ndx;
 			set_sleep_prescaler();
 			sleep_counter = 0;
-	ClrBit(PORTE, 1);
 		}
-	ClrBit(PORTE, 0);
 	}
 
 	sleep_ovf();
@@ -84,7 +80,6 @@ void sleep_dynamic(void)
 	// mind the overfow
 	if (sleep_counter < 0xffff)
 		++sleep_counter;
-		
 }
 
 void sleep_reset(void)

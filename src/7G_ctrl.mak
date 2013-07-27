@@ -9,11 +9,11 @@ FUSEH   = 0x91
 FUSEL   = 0xfd
 FUSEX   = 0xff
 
-CFLAGS  = -I. -Wall -Os -flto
+CFLAGS  = -I. -Wall -Os #-flto
 #CFLAGS += -DDBGPRINT
 
-LFLAGS  = -Wl,--relax -flto
-# LFLAGS += -u vfprintf -lprintf_min
+LFLAGS  = -Wl,--relax #-flto
+#LFLAGS += -u vfprintf -lprintf_min
 
 COMPILE = avr-gcc -mmcu=$(DEVICE) -DF_CPU=$(F_CPU) $(CFLAGS)
 
@@ -41,6 +41,8 @@ fuse:
 
 read_fuse:
 	$(AVRDUDE) -U hfuse:r:-:h -U lfuse:r:-:h -U efuse:r:-:h
+
+# $(COMPILE) -S -fverbose-asm $< -o $@
 
 .c.o:
 	$(COMPILE) -c $< -o $@
