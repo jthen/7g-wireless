@@ -90,7 +90,6 @@ void process_normal(void)
 			rf_ctrl_process_ack_payloads(NULL, NULL);
 
 		} while (!is_sent  &&  drop_cnt < MAX_DROP_CNT);
-		
 	} while (!waiting_for_all_keys_up  ||  are_all_keys_up);
 }
 

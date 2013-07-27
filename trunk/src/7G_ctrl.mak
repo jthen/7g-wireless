@@ -9,10 +9,10 @@ FUSEH   = 0x91
 FUSEL   = 0xfd
 FUSEX   = 0xff
 
-CFLAGS  = -I. -Wall -Os #-flto
+CFLAGS  = -I. -Wall -Os -flto
 #CFLAGS += -DDBGPRINT
 
-LFLAGS  = -Wl,--relax #-flto
+LFLAGS  = -Wl,--relax -flto
 #LFLAGS += -u vfprintf -lprintf_min
 
 COMPILE = avr-gcc -mmcu=$(DEVICE) -DF_CPU=$(F_CPU) $(CFLAGS)

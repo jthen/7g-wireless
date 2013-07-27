@@ -83,42 +83,19 @@ bool rf_ctrl_send_message(const void* buff, const uint8_t num_bytes)
 
 	nRF_CE_hi();	// signal the transceiver to send the packet
 
-	if (are_leds_on())
-	{
-		loop_until_bit_is_clear(PIN(NRF_IRQ_PORT), NRF_IRQ_BIT);
-	} else {
-		// go to low power while the nRF does it's magic
-		//goto_sleep_short(50);		// this will be about 50*17.36us=868us
-		goto_sleep(1);		// this will be about 50*17.36us=868us
-		
-		// wait for the IRQ pin to go low
-		while (PIN(NRF_IRQ_PORT) & _BV(NRF_IRQ_BIT))
-			//goto_sleep_short(10);	// this will be about 10*17.36us=173.6us
-			goto_sleep(1);	// this will be about 10*17.36us=173.6us
-	}
+	sleep_ticks(3);	// 3*277.78 = 833.34us
+	while (PIN(NRF_IRQ_PORT) & _BV(NRF_IRQ_BIT))
+		sleep_ticks(1);	// 277.78
 
 	nRF_CE_lo();
 
 	uint8_t status = nRF_NOP();				// read the status reg
 	bool ret_val = (status & vTX_DS);		// did we get an ACK?
 
-	// set the ACK payload flag
-	//*has_ack_payload = (status & vRX_DR);	// do we have an ACK payload?
-
 	nRF_FlushTX();
 	nRF_WriteReg(STATUS, vMAX_RT | vTX_DS | vRX_DR);	// reset the status flags
 	nRF_WriteReg(CONFIG, vEN_CRC | vCRCO);				// go to nRF power down
 	
-	/*
-	uint8_t c;
-	for (c = 0; c < num_bytes; ++c)
-		printf("%02x ", ((uint8_t*) buff)[c]);
-	nRF_ReadReg(FIFO_STATUS);
-	if ((nRF_data[1] & vTX_EMPTY) == 0)
-		printf(" TX NOT EMPTY!");
-	puts("");
-	*/
-
 	return ret_val;
 }
 
