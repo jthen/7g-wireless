@@ -8,15 +8,18 @@
 #include "sleeping.h"
 #include "matrix.h"
 #include "led.h"
+#include "utils.h"
 #include "avr_serial.h"
 
 // sleep one TCNT2 overflow cycle
 void sleep_ovf()
 {
-	set_sleep_mode(SLEEP_MODE_PWR_SAVE);
+	//SetBit(PORTE, 0);
+	set_sleep_mode(SLEEP_MODE_IDLE);
 	sleep_enable();
 	TCNT2 = 0;			// init the wake-up counter
 	sleep_mode();		// go to sleep
+	//ClrBit(PORTE, 0);
 	sleep_disable();
 }
 
@@ -30,17 +33,17 @@ typedef struct
 
 const __flash prescalers_t prescalers[4] = 
 {
-	{ _BV(CS22),                          1736,  444,   2},	// TCNT= 17.36us  OVF= 4.44ms
-	{ _BV(CS22) | _BV(CS20),              3472,  889,   4},	// TCNT= 34.72us  OVF= 8.89ms  
-	{ _BV(CS22) | _BV(CS21),              6944, 1778, 300},	// TCNT= 69.44us  OVF=17.78ms
-	{ _BV(CS22) | _BV(CS21) | _BV(CS20), 27778, 7111,   0},	// TCNT=277.78us  OVF=71.11ms
+	{ _BV(CS22),                          1736,  444,   1000},	// TCNT= 17.36us  OVF= 4.44ms
+	{ _BV(CS22) | _BV(CS20),              3472,  889,   2000},	// TCNT= 34.72us  OVF= 8.89ms  
+	{ _BV(CS22) | _BV(CS21),              6944, 1778,   3000},	// TCNT= 69.44us  OVF=17.78ms
+	{ _BV(CS22) | _BV(CS21) | _BV(CS20), 27778, 7111,   2},	// TCNT=277.78us  OVF=71.11ms
 };
 
-#define MIN_PRESCALER_NDX		1
+#define MIN_PRESCALER_NDX		0
 #define MAX_PRESCALER_NDX		3
 
 static uint16_t sleep_counter = 0;
-static uint8_t prescaler_ndx = MAX_PRESCALER_NDX;
+static uint8_t prescaler_ndx = MIN_PRESCALER_NDX;
 	
 void set_sleep_prescaler(void)
 {
@@ -58,19 +61,22 @@ void init_sleep(void)
 
 void sleep_dynamic(void)
 {
-	uint32_t time_in_prescaler_ms = 
-			((uint32_t) sleep_counter * prescalers[prescaler_ndx].ovf_dur_10us) / 100;
-
-	//if (prescaler_ndx >= 2)
-		dprinti((uint16_t) time_in_prescaler_ms);
-
 	// if we've waited enough in this prescaler
-	if (time_in_prescaler_ms > prescalers[prescaler_ndx].wait_s*1000
-			&&  prescaler_ndx < MAX_PRESCALER_NDX)
+	if (prescaler_ndx < MAX_PRESCALER_NDX)
 	{
-		++prescaler_ndx;
-		set_sleep_prescaler();
-		sleep_counter = 0;
+		uint32_t time_in_prescaler_ms = 
+			((uint32_t) sleep_counter * prescalers[prescaler_ndx].ovf_dur_10us) / 100;
+			
+	SetBit(PORTE, 0);
+		if (time_in_prescaler_ms > prescalers[prescaler_ndx].wait_s)
+		{
+	SetBit(PORTE, 1);
+			++prescaler_ndx;
+			set_sleep_prescaler();
+			sleep_counter = 0;
+	ClrBit(PORTE, 1);
+		}
+	ClrBit(PORTE, 0);
 	}
 
 	sleep_ovf();
@@ -78,12 +84,13 @@ void sleep_dynamic(void)
 	// mind the overfow
 	if (sleep_counter < 0xffff)
 		++sleep_counter;
+		
 }
 
 void sleep_reset(void)
 {
 	sleep_counter = 0;
-	prescaler_ndx = MAX_PRESCALER_NDX;
+	prescaler_ndx = MIN_PRESCALER_NDX;
 	set_sleep_prescaler();
 }
 
@@ -109,9 +116,7 @@ void wait_for_matrix_change(void)
 {
 	sleep_reset();
 	while (!matrix_scan())
-	{
 		sleep_dynamic();
-	}
 }
 
 // wake from sleep interrupt
