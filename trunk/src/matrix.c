@@ -378,4 +378,3 @@ bool is_any_key_pressed(void)
 	
 	return false;
 }
-

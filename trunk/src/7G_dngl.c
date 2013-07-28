@@ -17,7 +17,6 @@
 #include "rf_dngl.h"
 #include "keycode.h"
 #include "text_message.h"
-//#include "keycode_names.h"
 
 void init_hw(void)
 {
@@ -94,7 +93,7 @@ int	main(void)
 	bool consumer_report_ready = false;
 	bool idle_elapsed = false;
 	
-	puts("dongle online");
+	dprintf("dongle online\n");
 	
 	for (;;)
 	{
@@ -123,10 +122,11 @@ int	main(void)
 			memset(&vusb_keyboard_report, 0, sizeof vusb_keyboard_report);
 
 			static uint8_t prev_keycode = KC_NO;
-			
 			// get the next char from the stored text message
 			uint8_t c = msg_peek();
 			uint8_t new_keycode = get_keycode_for_char(c);
+			
+			dprintf("%c", c);
 			
 			// if the keycode is different than the previous
 			// otherwise just send an empty report to simulate key went up
@@ -148,19 +148,6 @@ int	main(void)
 		// send the keyboard report
         if (usbInterruptIsReady()  &&  (keyboard_report_ready  ||  idle_elapsed))
 		{
-			/*
-			uint8_t c = 0;
-			printf("HID ");
-			while (vusb_keyboard_report.keys[c])
-			{
-				char buff[28];
-				strcpy_P(buff, GetCodeName(vusb_keyboard_report.keys[c]));
-				printf("%s ", buff);
-				++c;
-			}
-			puts(c ? "" : "<empty>");
-			*/
-
             usbSetInterrupt((void*) &vusb_keyboard_report, sizeof vusb_keyboard_report);
 			keyboard_report_ready = false;
 			

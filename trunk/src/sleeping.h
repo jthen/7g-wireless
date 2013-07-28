@@ -24,3 +24,8 @@ void sleep_ticks(uint8_t sleep_cnt);
 void wait_for_all_keys_up(void);
 void wait_for_key_down(void);
 void wait_for_matrix_change(void);
+
+uint16_t get_seconds(void);
+
+uint16_t get_thword(void);
+uint16_t get_tlword(void);
