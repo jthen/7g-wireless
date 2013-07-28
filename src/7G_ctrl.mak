@@ -2,7 +2,7 @@ TARGET  = 7G_ctrl
 DEVICE  = atmega169p
 #F_CPU   = 1000000
 F_CPU   = 3686400
-AVRDUDE = avrdude -c dragon_isp -P usb -p $(DEVICE)
+AVRDUDE = avrdude -c dragon_isp -P usb -B2 -p $(DEVICE)
 
 # fuses for the ATmega169P
 FUSEH   = 0x91
@@ -10,7 +10,7 @@ FUSEL   = 0xfd
 FUSEX   = 0xff
 
 CFLAGS  = -I. -Wall -Os -flto
-#CFLAGS += -DDBGPRINT
+CFLAGS += -DDBGPRINT
 
 LFLAGS  = -Wl,--relax -flto
 #LFLAGS += -u vfprintf -lprintf_min
@@ -31,7 +31,7 @@ $(TARGET).hex: $(OBJECTS)
 	avr-size -C --mcu=$(DEVICE) $(TARGET).elf
 
 flash: $(TARGET).hex
-	$(AVRDUDE) -V -B2 -U flash:w:$(TARGET).hex:i
+	$(AVRDUDE) -V -U flash:w:$(TARGET).hex:i
 
 clean:
 	rm -f $(TARGET).hex $(TARGET).elf $(OBJECTS)

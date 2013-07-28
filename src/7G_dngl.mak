@@ -1,7 +1,7 @@
 TARGET  = 7G_dngl
 DEVICE  = atmega328p
 F_CPU   = 12000000
-AVRDUDE = avrdude -c stk500v2 -P avrdoper -p $(DEVICE)
+AVRDUDE = avrdude -c stk500v2 -P avrdoper -B1 -p $(DEVICE)
 
 CFLAGS  = -I. -Iusbdrv -DIS_DONGLE=1 -flto
 
@@ -23,7 +23,7 @@ $(TARGET).hex: $(OBJECTS)
 	avr-size -C --mcu $(DEVICE) $(TARGET).elf
 
 flash: $(TARGET).hex
-	$(AVRDUDE) -U flash:w:$(TARGET).hex:i
+	$(AVRDUDE) -V -U flash:w:$(TARGET).hex:i
 
 clean:
 	rm -f *.hex *.elf $(OBJECTS)

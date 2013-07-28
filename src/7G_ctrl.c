@@ -27,6 +27,8 @@ void process_normal(void)
 	bool waiting_for_all_keys_up = false;
 	bool are_all_keys_up;
 
+//SetBit(PORTE, 1);
+
 	do {
 		wait_for_matrix_change();
 
@@ -53,7 +55,9 @@ void process_normal(void)
 			if (is_pressed(KC_F6))		report.consumer |= _BV(FN_NEXT_TRACK_BIT);
 
 			if (is_pressed(KC_ESC))
+			{
 				waiting_for_all_keys_up = true;
+			}
 
 		} else {
 		
@@ -91,17 +95,19 @@ void process_normal(void)
 
 		} while (!is_sent  &&  drop_cnt < MAX_DROP_CNT);
 	} while (!waiting_for_all_keys_up  ||  are_all_keys_up);
+	
+//ClrBit(PORTE, 1);
+	
 }
 
 void send_text(const char* msg, bool is_flash, bool wait_for_finish)
 {
-	/*
 	if (is_flash)
-		dprintf_P(txt);
+		dprintf_P(msg);
 	else
-		dprintf(txt);
+		dprintf(msg);
 	_delay_ms(1);
-	*/
+	return;
 
 	rf_msg_text_t txt_msg;
 	txt_msg.msg_type = MT_TEXT;
@@ -226,13 +232,14 @@ uint8_t get_key_input(void)
 
 void process_menu(void)
 {
+//SetBit(PORTE, 0);
 	// print the main menu
 	bool exit_menu = false;
 	uint8_t keycode;
 	char string_buff[10];
 	while (!exit_menu)
 	{
-		send_text(PSTR("\x017G wireless config menu\n"
+		send_text(PSTR("7G wireless config menu\n"
 						"battery voltage="), true, false);
 
 		get_battery_voltage_str(string_buff);
@@ -256,6 +263,10 @@ void process_menu(void)
 		send_text(PSTR(")\nESC - exit menu\n\n"), true, false);
 		
 		do {
+			dprinti(get_thword());
+			dprinti(get_tlword());
+			dprinti(get_seconds());
+			_delay_ms(50);
 			keycode = get_key_input();
 		} while (keycode != KC_F1  &&  keycode != KC_F2  &&  keycode != KC_ESC);
 
@@ -292,6 +303,7 @@ void process_menu(void)
 			send_text(PSTR("\nexiting menu, you can type now\n"), true, true);
 		}
 	}
+//ClrBit(PORTE, 0);
 }
 
 void init_hw(void)
@@ -313,8 +325,8 @@ void init_hw(void)
 	DDRF = 0;	PORTF = 0xff;
 	DDRG = 0;	PORTG = 0xff;
 	
-	DDRE = _BV(0) | _BV(1);	// !!!
-	PORTE = 0;
+	//DDRE = _BV(0) | _BV(1);	// !!!
+	//PORTE = 0;
 }
 
 int main(void)
@@ -335,7 +347,7 @@ int main(void)
 	for (;;)
 	{
 		process_normal();
-		//process_menu();
+		process_menu();
 	}
 
 	return 0;

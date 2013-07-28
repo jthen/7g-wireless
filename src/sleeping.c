@@ -11,16 +11,69 @@
 #include "utils.h"
 #include "avr_serial.h"
 
-uint16_t tcnt2_lword = 0;
-uint16_t tcnt2_hword = 0;
-
-void add_ticks(const uint8_t ticks)
+// this is our watch
+// not 100% accurate, but serves the purpose
+// it's updated only from add_ricks() and read from get_seconds()
+typedef struct
 {
-	// mind the overflow
-	if (ticks > 0xffff - tcnt2_lword)
-		tcnt2_hword++;
+	uint16_t tcnt2_lword;	// overflows every 71.111111ms*0xff == 18.204444s
+							// resolution == 277.77777us
+	uint16_t tcnt2_hword;	// overflows every 1193028.266666s, 331.396h, 13.808days
+							// resolution == 18.204444s
+							
+	uint8_t tcnt2_vhbyte;	// this one ain't overflowing for the duration of the batteries
+} watch_t;
+
+watch_t watch = {0, 0, 0};
+
+void init_sleep(void)
+{
+	// we need to wake up quick (an internal 1MHz RC would probably be a better option
+	set_sleep_mode(SLEEP_MODE_IDLE);
+	
+	// config the wake-up timer
+	TCCR2A = _BV(WGM21) | _BV(WGM20)	// CTC mode
+				| _BV(CS22) | _BV(CS21) | _BV(CS20);	// 1024 prescaler
+														// TCNT=277.78us  OVF=71.11ms
+
+	TIMSK2 = _BV(TOIE2);	// interrupt on overflow
+}
+
+void add_ticks(uint8_t ticks)
+{
+	// we assume the error on average is half a tick
+	// so add a tick every other call to account for this
+	static uint8_t correction = 0;
+	ticks += correction;
+	correction = correction ? 0 : 1;
 		
-	tcnt2_lword += ticks;
+	// mind the overflow
+	if (ticks > 0xffff - watch.tcnt2_lword)
+	{
+		if (watch.tcnt2_hword == 0xffff)
+			++watch.tcnt2_vhbyte;
+			
+		++watch.tcnt2_hword;
+	}
+	
+	watch.tcnt2_lword += ticks;
+}
+
+uint16_t get_thword(void)
+{
+	return watch.tcnt2_hword;
+}
+
+uint16_t get_tlword(void)
+{
+	return watch.tcnt2_lword;
+}
+
+uint16_t get_seconds(void)
+{
+	uint16_t ret_val = watch.tcnt2_lword / 3600;
+	ret_val += (watch.tcnt2_hword * 182) / 10;
+	return ret_val;
 }
 
 // wake from sleep interrupt
@@ -30,8 +83,6 @@ ISR(TIMER2_OVF_vect)
 // sleep for sleep_ticks number of TCNT2 ticks
 void sleep_ticks(uint8_t ticks)
 {
-SetBit(PORTE, 1);
-
 	if (are_leds_on())
 	{
 		add_ticks(ticks);
@@ -45,19 +96,6 @@ SetBit(PORTE, 1);
 		sleep_mode();				// go to sleep
 		sleep_disable();
 	}
-ClrBit(PORTE, 1);
-}
-
-void init_sleep(void)
-{
-	set_sleep_mode(SLEEP_MODE_IDLE);
-	
-	// config the wake-up timer
-	TCCR2A = _BV(WGM21) | _BV(WGM20)	// CTC mode
-				| _BV(CS22) | _BV(CS21) | _BV(CS20);	// 1024 prescaler
-														// TCNT=277.78us  OVF=71.11ms
-
-	TIMSK2 = _BV(TOIE2);	// interrupt on overflow
 }
 
 uint16_t dyn_sleep_ticks = 0;
