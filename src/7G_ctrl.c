@@ -164,7 +164,7 @@ void send_text(const char* msg, bool is_flash, bool wait_for_finish)
 // for instance: get_battery_voltage() returning 278 means voltage == 2.78V
 uint16_t get_battery_voltage(void)
 {
-	//power_adc_enable();
+	power_adc_enable();
 	
 	ADMUX = _B0(REFS1) | _B0(REFS0)	// reference AVCC
 			| _B1(ADLAR)			// left adjust ADC
@@ -184,7 +184,7 @@ uint16_t get_battery_voltage(void)
 	
 	ADCSRA = 0;				// disable ADC
 	
-	//power_adc_disable();	// ADC power off
+	power_adc_disable();	// ADC power off
 	
 	return 28050 / adc_result;
 }
@@ -228,7 +228,6 @@ uint8_t get_key_input(void)
 
 void process_menu(void)
 {
-//SetBit(PORTE, 0);
 	// print the main menu
 	bool exit_menu = false;
 	uint8_t keycode;
@@ -299,13 +298,12 @@ void process_menu(void)
 			send_text(PSTR("\nexiting menu, you can type now\n"), true, true);
 		}
 	}
-//ClrBit(PORTE, 0);
 }
 
 void init_hw(void)
 {
 	// power down everything we don't need
-	//power_adc_disable();	// power on/off in get_battery_voltage()
+	power_adc_disable();	// power on/off in get_battery_voltage()
 	power_lcd_disable();
 	//power_spi_disable();	// maybe we should power this off when not in use?
 	power_timer1_disable();
