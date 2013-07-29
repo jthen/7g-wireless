@@ -39,8 +39,9 @@ uint16_t get_tlword(void)
 uint16_t get_seconds(void)
 {
 	uint16_t ret_val = watch.tcnt2_lword / 3600;
-	ret_val += (watch.tcnt2_hword * 182) / 10;
-	return ret_val;
+	uint32_t rl_hi = (watch.tcnt2_hword * 91);
+	rl_hi /= 5;		// * 91 / 5  is identical to * 18.2
+	return ret_val + rl_hi;
 }
 
 void init_sleep(void)
