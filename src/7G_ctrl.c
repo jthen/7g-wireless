@@ -27,8 +27,6 @@ void process_normal(void)
 	bool waiting_for_all_keys_up = false;
 	bool are_all_keys_up;
 
-//SetBit(PORTE, 1);
-
 	do {
 		wait_for_matrix_change();
 
@@ -94,10 +92,8 @@ void process_normal(void)
 			rf_ctrl_process_ack_payloads(NULL, NULL);
 
 		} while (!is_sent  &&  drop_cnt < MAX_DROP_CNT);
+		
 	} while (!waiting_for_all_keys_up  ||  are_all_keys_up);
-	
-//ClrBit(PORTE, 1);
-	
 }
 
 void send_text(const char* msg, bool is_flash, bool wait_for_finish)

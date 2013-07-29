@@ -26,39 +26,6 @@ typedef struct
 
 watch_t watch = {0, 0, 0};
 
-void init_sleep(void)
-{
-	// we need to wake up quick (an internal 1MHz RC would probably be a better option
-	set_sleep_mode(SLEEP_MODE_IDLE);
-	
-	// config the wake-up timer
-	TCCR2A = _BV(WGM21) | _BV(WGM20)	// CTC mode
-				| _BV(CS22) | _BV(CS21) | _BV(CS20);	// 1024 prescaler
-														// TCNT=277.78us  OVF=71.11ms
-
-	TIMSK2 = _BV(TOIE2);	// interrupt on overflow
-}
-
-void add_ticks(uint8_t ticks)
-{
-	// we assume the error on average is half a tick
-	// so add a tick every other call to account for this
-	static uint8_t correction = 0;
-	ticks += correction;
-	correction = correction ? 0 : 1;
-		
-	// mind the overflow
-	if (ticks > 0xffff - watch.tcnt2_lword)
-	{
-		if (watch.tcnt2_hword == 0xffff)
-			++watch.tcnt2_vhbyte;
-			
-		++watch.tcnt2_hword;
-	}
-	
-	watch.tcnt2_lword += ticks;
-}
-
 uint16_t get_thword(void)
 {
 	return watch.tcnt2_hword;
@@ -76,6 +43,41 @@ uint16_t get_seconds(void)
 	return ret_val;
 }
 
+void init_sleep(void)
+{
+	// we need to wake up quick (an internal 1MHz RC would probably be a better option
+	set_sleep_mode(SLEEP_MODE_IDLE);
+	
+	// config the wake-up timer
+	TCCR2A = _BV(WGM21) | _BV(WGM20)	// CTC mode
+				| _BV(CS22) | _BV(CS21) | _BV(CS20);	// 1024 prescaler
+														// TCNT=277.78us  OVF=71.11ms
+
+	TIMSK2 = _BV(TOIE2);	// interrupt on overflow
+}
+
+void add_ticks(uint16_t ticks)
+{
+	// we assume the error on average is half a tick
+	// so add a tick every other call to account for this
+	static uint8_t correction = 0;
+	ticks += correction;
+	correction = correction ? 0 : 1;
+
+	// mind the overflow
+	if (ticks > 0xffff - watch.tcnt2_lword)
+	{
+		if (watch.tcnt2_hword == 0xffff)
+			++watch.tcnt2_vhbyte;
+
+		++watch.tcnt2_hword;
+
+		//TogBit(PORTE, 1);
+	}
+	
+	watch.tcnt2_lword += ticks;
+}
+
 // wake from sleep interrupt
 ISR(TIMER2_OVF_vect)
 {}
@@ -83,11 +85,15 @@ ISR(TIMER2_OVF_vect)
 // sleep for sleep_ticks number of TCNT2 ticks
 void sleep_ticks(uint8_t ticks)
 {
+//SetBit(PORTE, 0);
 	if (are_leds_on())
 	{
-		add_ticks(ticks);
+		uint8_t prev_ticks = TCNT2;
+		
 		while (ticks--)
 			_delay_us(277.78);
+			
+		add_ticks(ticks - prev_ticks);
 	} else {
 		sleep_enable();
 		add_ticks(TCNT2);
@@ -96,9 +102,10 @@ void sleep_ticks(uint8_t ticks)
 		sleep_mode();				// go to sleep
 		sleep_disable();
 	}
+//ClrBit(PORTE, 0);
 }
 
-uint16_t dyn_sleep_ticks = 0;
+uint8_t dyn_sleep_ticks = 0;
 uint8_t sleep_ticks_prescaler = 0;
 
 #define MIN_SLEEP_TICKS		0x01
