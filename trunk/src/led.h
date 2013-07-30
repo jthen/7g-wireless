@@ -27,4 +27,5 @@ void start_led_sequence(const __flash led_sequence_t* seq);
 
 // LED sequences
 extern const __flash led_sequence_t led_seq_succ_and_return[];
-extern const __flash led_sequence_t led_seq_pulse[];
+extern const __flash led_sequence_t led_seq_pulse_on[];
+extern const __flash led_sequence_t led_seq_pulse_off[];

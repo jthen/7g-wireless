@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -104,6 +105,7 @@ void send_text(const char* msg, bool is_flash, bool wait_for_finish)
 	else
 		dprint(msg);
 	_delay_ms(1);
+	return;
 #endif
 
 	rf_msg_text_t txt_msg;
@@ -173,8 +175,9 @@ uint16_t get_battery_voltage(void)
 			| _B1(ADLAR)			// left adjust ADC
 			| 0b11110;				// measure 1.1v internal reference
 			
-	ADCSRA = _BV(ADEN)		// enable ADC
-			| _BV(ADSC);	// start conversion
+	ADCSRA = _BV(ADEN)					// enable ADC
+			| _BV(ADPS2) | _BV(ADPS1) | _BV(ADPS0)	// prescaler 128
+			| _BV(ADSC);				// start conversion
 	
 	// wait for the conversion to finish
 	loop_until_bit_is_set(ADCSRA, ADIF);
@@ -247,6 +250,8 @@ const uint8_t __flash led_brightness_lookup[] =
 
 void process_menu(void)
 {
+	start_led_sequence(led_seq_pulse_on);
+	
 	// print the main menu
 	bool exit_menu = false;
 	uint8_t keycode;
@@ -270,7 +275,7 @@ void process_menu(void)
 		itoa(days, string_buff, 10);
 		send_text(string_buff, false, false);
 		send_text(PSTR("days "), true, false);
-		
+
 		itoa(hours, string_buff, 10);
 		send_text(string_buff, false, false);
 		send_text(PSTR("hour "), true, false);
@@ -303,6 +308,11 @@ void process_menu(void)
 
 		do {
 			keycode = get_key_input();
+			
+			get_battery_voltage_str(string_buff);
+			send_text(string_buff, false, false);
+			send_text("\n", false, false);
+			
 		} while (keycode != KC_F1  &&  keycode != KC_F2  &&  keycode != KC_ESC);
 
 		if (keycode == KC_F1)
@@ -338,6 +348,8 @@ void process_menu(void)
 			send_text(PSTR("\nexiting menu, you can type now\n"), true, true);
 		}
 	}
+
+	start_led_sequence(led_seq_pulse_off);
 }
 
 void init_hw(void)

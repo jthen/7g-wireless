@@ -159,17 +159,19 @@ const __flash led_sequence_t led_seq_succ_and_return[] =
 	{4, 20, 1, 0},
 	{1, 20, 1, 0},
 	
-	{0,  0, 0, 0},
+	{0,0,0,0},
 };
 
-const __flash led_sequence_t led_seq_pulse[] = 
+const __flash led_sequence_t led_seq_pulse_on[] = 
 {
-	{7, 50,   1,  2},
-	{7, 50, 100, -2},
-	{7, 50,   1,  2},
-	{7, 50, 100, -2},
-	{7, 50,   1,  2},
-	{7, 50, 100, -2},
+	{7,150, 1, 1},
 	
-	{0,   0, 0},
+	{0,0,0,0},
+};
+
+const __flash led_sequence_t led_seq_pulse_off[] = 
+{
+	{7,150, 151, -1},
+
+	{0,0,0,0},
 };
