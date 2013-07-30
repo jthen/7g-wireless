@@ -14,17 +14,17 @@
 // this is our watch
 // not 100% accurate, but serves the purpose
 // it's updated only from add_ricks() and read from get_seconds()
-typedef struct
+struct 
 {
 	uint16_t tcnt2_lword;	// overflows every 71.111111ms*0xff == 18.204444s
 							// resolution == 277.77777us
+
 	uint16_t tcnt2_hword;	// overflows every 1193028.266666s, 331.396h, 13.808days
 							// resolution == 18.204444s
 							
-	uint8_t tcnt2_vhbyte;	// this one ain't overflowing for the duration of the batteries
-} watch_t;
-
-watch_t watch = {0, 0, 0};
+	uint8_t tcnt2_vhbyte;	// overflows every 3521.0366 days
+							// resolution = 13.808 days
+} watch = {0, 0, 0};
 
 uint16_t get_thword(void)
 {
@@ -36,12 +36,37 @@ uint16_t get_tlword(void)
 	return watch.tcnt2_lword;
 }
 
+uint32_t get_seconds32(void)
+{
+	uint32_t ret_val = watch.tcnt2_hword;
+	ret_val <<= 16;
+	ret_val |= watch.tcnt2_lword;
+	ret_val /= 3600;
+
+	uint32_t vh_calc = watch.tcnt2_vhbyte;
+	vh_calc *= 2386093;
+	vh_calc /= 2;
+
+	ret_val += vh_calc;
+
+	return ret_val;
+}
+
 uint16_t get_seconds(void)
 {
-	uint16_t ret_val = watch.tcnt2_lword / 3600;
-	uint32_t rl_hi = (watch.tcnt2_hword * 91);
-	rl_hi /= 5;		// * 91 / 5  is identical to * 18.2
-	return ret_val + rl_hi;
+	return (uint16_t) get_seconds32();
+}
+
+void get_time(uint16_t* days, uint8_t* hours, uint8_t* minutes, uint8_t* seconds)
+{
+	uint32_t sec = get_seconds32();
+	*seconds = sec % 60;
+	sec /= 60;
+	*minutes = sec % 60;
+	sec /= 60;
+	*hours = sec % 24;
+	sec /= 24;
+	*days = sec;
 }
 
 void init_sleep(void)
