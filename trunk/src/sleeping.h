@@ -29,3 +29,10 @@ uint16_t get_seconds(void);
 
 uint16_t get_thword(void);
 uint16_t get_tlword(void);
+
+// these return the number of seconds since reset (with overflow)
+uint32_t get_seconds32(void);
+uint16_t get_seconds(void);
+
+// returns the time since reset
+void get_time(uint16_t* days, uint8_t* hours, uint8_t* minutes, uint8_t* seconds);

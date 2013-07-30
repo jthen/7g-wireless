@@ -4,13 +4,13 @@ F_CPU   = 12000000
 AVRDUDE = avrdude -c stk500v2 -P avrdoper -B1 -p $(DEVICE)
 
 CFLAGS  = -I. -Iusbdrv -DIS_DONGLE=1 -flto
+#CFLAGS += -DDBGPRINT
 
 LFLAGS  = -Wl,--relax -flto
 # LFLAGS += -u vfprintf -lprintf_min
 
 OBJECTS = $(TARGET).o 7G_vusb.o nRF24L01.o rf_dngl.o rf_addr.o text_message.o usbdrv/usbdrv.o usbdrv/usbdrvasm.o
 OBJECTS += avr_serial.o
-#OBJECTS += keycode_names.o
 
 COMPILE = avr-gcc -Wall -Os -DF_CPU=$(F_CPU) $(CFLAGS) -mmcu=$(DEVICE)
 

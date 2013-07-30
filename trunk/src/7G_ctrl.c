@@ -98,12 +98,13 @@ void process_normal(void)
 
 void send_text(const char* msg, bool is_flash, bool wait_for_finish)
 {
+#ifdef DBGPRINT
 	if (is_flash)
-		dprintf_P(msg);
+		dprint_P(msg);
 	else
-		dprintf(msg);
+		dprint(msg);
 	_delay_ms(1);
-	return;
+#endif
 
 	rf_msg_text_t txt_msg;
 	txt_msg.msg_type = MT_TEXT;
@@ -128,10 +129,12 @@ void send_text(const char* msg, bool is_flash, bool wait_for_finish)
 		msg += chunklen;
 
 		// query the free space of the buffer on the dongle to see if
-		// it is larege enough to store the next chunk
+		// it is large enough to store the next chunk
 
 		for (;;)
 		{
+			sleep_dynamic();
+			
 			rf_ctrl_send_message(&txt_msg, 1);
 
 			rf_ctrl_process_ack_payloads(&msg_bytes_free, NULL);
@@ -226,6 +229,22 @@ uint8_t get_key_input(void)
 	return keycode_pressed;
 }
 
+const uint8_t __flash led_brightness_lookup[] = 
+{
+	1,		// F1
+	3,		// F2
+	5,		// F3
+	8,		// F4
+	13,		// F5
+	20,		// F6
+	30,		// F7
+	50,		// F8
+	80,		// F9
+	120,	// F10
+	190,	// F11
+	254,	// F12
+};
+
 void process_menu(void)
 {
 	// print the main menu
@@ -234,12 +253,37 @@ void process_menu(void)
 	char string_buff[10];
 	while (!exit_menu)
 	{
-		send_text(PSTR("7G wireless config menu\n"
+		// welcome & version
+		send_text(PSTR("\x01" "7G wireless\n"
+						"firmware build " __DATE__ "  " __TIME__ "\n"
 						"battery voltage="), true, false);
 
 		get_battery_voltage_str(string_buff);
 		send_text(string_buff, false, false);
+
+		// output the time since reset
+		uint16_t days;
+		uint8_t hours, minutes, seconds;
+		get_time(&days, &hours, &minutes, &seconds);
+		send_text(PSTR("\nkeyboard's been on for "), true, false);
 		
+		itoa(days, string_buff, 10);
+		send_text(string_buff, false, false);
+		send_text(PSTR("days "), true, false);
+		
+		itoa(hours, string_buff, 10);
+		send_text(string_buff, false, false);
+		send_text(PSTR("hour "), true, false);
+
+		itoa(minutes, string_buff, 10);
+		send_text(string_buff, false, false);
+		send_text(PSTR("min "), true, false);
+
+		itoa(seconds, string_buff, 10);
+		send_text(string_buff, false, false);
+		send_text(PSTR("sec\n"), true, false);
+		
+		// menu
 		send_text(PSTR("\n\nwhat do you want to do?\n"
 						"F1 - change transmitter output power (current "), true, false);
 		switch (get_nrf_output_power())
@@ -255,13 +299,9 @@ void process_menu(void)
 		itoa(get_led_brightness(), string_buff, 10);
 		send_text(string_buff, false, false);
 		
-		send_text(PSTR(")\nESC - exit menu\n\n"), true, false);
-		
+		send_text(PSTR(")\nEsc - exit menu\n\n"), true, false);
+
 		do {
-			dprinti(get_thword());
-			dprinti(get_tlword());
-			dprinti(get_seconds());
-			_delay_ms(50);
 			keycode = get_key_input();
 		} while (keycode != KC_F1  &&  keycode != KC_F2  &&  keycode != KC_ESC);
 
@@ -288,7 +328,7 @@ void process_menu(void)
 				keycode = get_key_input();
 				if (keycode >= KC_F1  &&  keycode <= KC_F12)
 				{
-					set_led_brightness((keycode - KC_F1)*10 + 1);
+					set_led_brightness(led_brightness_lookup[keycode - KC_F1]);
 					set_leds(7, 50);
 				}
 			} while (keycode != KC_ESC);
@@ -321,12 +361,7 @@ void init_hw(void)
 	
 	//DDRE = _BV(0) | _BV(1);	// !!!
 	//PORTE = 0;
-}
-
-int main(void)
-{
-	// initialize the hardware
-	init_hw();
+	
 	matrix_init();
 	rf_ctrl_init();
 	init_leds();
@@ -334,10 +369,16 @@ int main(void)
 #ifdef DBGPRINT	
 	init_serial();
 #endif
+}
+
+int main(void)
+{
+	// initialize the hardware
+	init_hw();
 	
 	sei();	// enable interrupts
 
-	dprintf("i live...\n");	
+	dprint("i live...\n");	
 	for (;;)
 	{
 		process_normal();
