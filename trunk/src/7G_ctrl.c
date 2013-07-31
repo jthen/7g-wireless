@@ -82,7 +82,7 @@ void process_normal(void)
 
 		// send the report and wait for ACK
 		bool is_sent;
-		const uint8_t MAX_DROP_CNT = 10;
+		const uint8_t MAX_SEND_RETRY = 10;
 		uint8_t drop_cnt = 0;
 		do {
 			is_sent = rf_ctrl_send_message(&report, num_keys + 3);
@@ -92,7 +92,7 @@ void process_normal(void)
 			// flush the ACK payloads
 			rf_ctrl_process_ack_payloads(NULL, NULL);
 
-		} while (!is_sent  &&  drop_cnt < MAX_DROP_CNT);
+		} while (!is_sent  &&  drop_cnt < MAX_SEND_RETRY);
 		
 	} while (!waiting_for_all_keys_up  ||  are_all_keys_up);
 }
@@ -100,6 +100,14 @@ void process_normal(void)
 void send_text(const char* msg, bool is_flash, bool wait_for_finish)
 {
 #ifdef DBGPRINT
+	// this needs an explanation: I am using the AVR Dragon to flash the keyboard firmware
+	// and it looks like the dragon has a strong pullup on the MISO line. this pullup is
+	// stronger than the nRF24L01+ MISO output driver, so if the programming ISP cable is plugged in
+	// it keeps MISO high all the time, and I can't read anything from the nRF24L01+ and the send_text()
+	// function will never return.
+	//
+	// so, instead of plugging the ISP cable in and out all the time while testing firmware updates,
+	// I just output the text to UART and return
 	if (is_flash)
 		dprint_P(msg);
 	else
