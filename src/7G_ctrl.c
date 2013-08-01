@@ -100,13 +100,13 @@ void process_normal(void)
 void send_text(const char* msg, bool is_flash, bool wait_for_finish)
 {
 #ifdef DBGPRINT
-	// this needs an explanation: I am using the AVR Dragon to flash the keyboard firmware
-	// and it looks like the dragon has a strong pullup on the MISO line. this pullup is
+	// This needs an explanation: I am using the AVR Dragon to flash the keyboard firmware
+	// and it looks like the dragon has a strong pullup on the MISO line. This pullup is
 	// stronger than the nRF24L01+ MISO output driver, so if the programming ISP cable is plugged in
 	// it keeps MISO high all the time, and I can't read anything from the nRF24L01+ and the send_text()
 	// function will never return.
 	//
-	// so, instead of plugging the ISP cable in and out all the time while testing firmware updates,
+	// So, instead of plugging the ISP cable in and out all the time while testing firmware updates,
 	// I just output the text to UART and return
 	if (is_flash)
 		dprint_P(msg);
