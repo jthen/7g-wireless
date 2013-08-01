@@ -4,7 +4,7 @@ DEVICE  = atmega169p
 F_CPU   = 3686400
 AVRDUDE = avrdude -c dragon_isp -P usb -B2 -p $(DEVICE)
 
-# fuses for the ATmega169P
+# fuses for the ATmega169PV
 FUSEH   = 0x91
 FUSEL   = 0xfd
 FUSEX   = 0xff
