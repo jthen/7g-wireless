@@ -71,7 +71,7 @@ void get_time(uint16_t* days, uint8_t* hours, uint8_t* minutes, uint8_t* seconds
 
 void init_sleep(void)
 {
-	// we need to wake up quick (an internal 1MHz RC would probably be a better option
+	// we need to wake up quick (the internal 1MHz RC would probably be a better option)
 	set_sleep_mode(SLEEP_MODE_IDLE);
 	
 	// config the wake-up timer
