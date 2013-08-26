@@ -1,7 +1,11 @@
-#include <stdio.h>
+#include <stdint.h>
 
-#include <avr/io.h>
-#include <util/delay.h>
+#ifdef AVR
+# include <avr/io.h>
+# include <util/delay.h>
+#else
+# define _BV(a)		(1 << (a))
+#endif
 
 #include "nRF24L01.h"
 
