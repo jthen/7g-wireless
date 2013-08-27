@@ -268,7 +268,7 @@ void process_menu(void)
 		// welcome & version
 		send_text(PSTR("\x01" "7G wireless\n"
 						"firmware build " __DATE__ "  " __TIME__ "\n"
-						"battery voltage="), true, false);
+						"battery voltage: "), true, false);
 
 		get_battery_voltage_str(string_buff);
 		send_text(string_buff, false, false);
@@ -392,12 +392,12 @@ void init_hw(void)
 
 int main(void)
 {
-	// initialize the hardware
-	init_hw();
-	
-	sei();	// enable interrupts
+	init_hw();	// initialize the hardware
 
-	dprint("i live...\n");	
+	sei();		// enable interrupts
+
+	// dprint("i live...\n");
+
 	for (;;)
 	{
 		process_normal();

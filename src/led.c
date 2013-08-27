@@ -8,6 +8,7 @@
 #include "led.h"
 #include "utils.h"
 #include "ctrl_settings.h"
+#include "avr_serial.h"
 
 volatile uint8_t curr_led_status = 0;
 volatile uint8_t cycle_counter;		// duration the LEDs are on
@@ -20,7 +21,7 @@ void turn_on_leds(void)
 	DDRG = curr_led_status;
 	PORTG = ~curr_led_status;
 	
-	// PWM?
+	// change the PWM duty cycle?
 	if (sequence)
 		OCR0A += sequence->pwm_delta;
 }
@@ -44,9 +45,6 @@ ISR(TIMER0_COMP_vect)
 	
 	if (--cycle_counter == 0)
 	{
-		// reset the PWM duty cycle
-		OCR0A = get_led_brightness();
-
 		if (sequence == 0)
 		{
 			// stop the timer
@@ -125,8 +123,8 @@ void start_led_sequence(const __flash led_sequence_t* seq)
 {
 	sequence = seq;
 	
-	// reset the PWM duty cycle
-	OCR0A = get_led_brightness();
+	// init the PWM duty cycle
+	OCR0A = seq->brightness;
 
 	// set the status
 	curr_led_status = seq->led_status;
@@ -164,14 +162,14 @@ const __flash led_sequence_t led_seq_succ_and_return[] =
 
 const __flash led_sequence_t led_seq_pulse_on[] = 
 {
-	{7,150, 1, 1},
+	{7, 45, 0, 3},
 	
 	{0,0,0,0},
 };
 
 const __flash led_sequence_t led_seq_pulse_off[] = 
 {
-	{7,150, 151, -1},
+	{7, 45, 136, -3},
 
 	{0,0,0,0},
 };
