@@ -10,7 +10,7 @@ LFLAGS  = -Wl,--relax -flto
 # LFLAGS += -u vfprintf -lprintf_min
 
 OBJECTS = $(TARGET).o 7G_vusb.o nRF24L01.o rf_dngl.o rf_addr.o text_message.o usbdrv/usbdrv.o usbdrv/usbdrvasm.o
-OBJECTS += avr_serial.o
+OBJECTS += avrdbg.o
 
 COMPILE = avr-gcc -Wall -Os -DF_CPU=$(F_CPU) $(CFLAGS) -mmcu=$(DEVICE)
 

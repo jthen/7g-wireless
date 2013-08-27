@@ -18,9 +18,9 @@ LFLAGS  = -Wl,--relax -flto
 COMPILE = avr-gcc -mmcu=$(DEVICE) -DF_CPU=$(F_CPU) $(CFLAGS)
 
 OBJECTS = $(TARGET).o nRF24L01.o matrix.o led.o rf_ctrl.o rf_addr.o sleeping.o ctrl_settings.o
-# avr_serial.c contains debugging helper functions which should
+# avrdbg.c contains debugging helper functions which should
 # not be included in the final version
-OBJECTS += avr_serial.o
+OBJECTS += avrdbg.o
 
 hex: $(TARGET).hex
 

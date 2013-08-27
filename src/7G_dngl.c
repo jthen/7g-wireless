@@ -10,7 +10,7 @@
 #include <util/delay.h>
 
 #include "7G_vusb.h"
-#include "avr_serial.h"
+#include "avrdbg.h"
 #include "utils.h"
 #include "hw_setup.h"
 #include "rf_protocol.h"

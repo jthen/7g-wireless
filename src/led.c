@@ -8,7 +8,6 @@
 #include "led.h"
 #include "utils.h"
 #include "ctrl_settings.h"
-#include "avr_serial.h"
 
 volatile uint8_t curr_led_status = 0;
 volatile uint8_t cycle_counter;		// duration the LEDs are on

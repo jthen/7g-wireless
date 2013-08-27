@@ -11,7 +11,7 @@
 #include <util/delay.h>
 
 #include "hw_setup.h"
-#include "avr_serial.h"
+#include "avrdbg.h"
 #include "utils.h"
 #include "matrix.h"
 #include "led.h"
@@ -368,6 +368,8 @@ void init_hw(void)
 	power_timer1_disable();
 	power_usart0_disable();	// init_serial() will power on the USART if called
 	SetBit(ACSR, ACD);		// analog comparator off
+	
+	CLKPR = 0;
 	
 	// default all pins to input with pullups
 	DDRA = 0;	PORTA = 0xff;
