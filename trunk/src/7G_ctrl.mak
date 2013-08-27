@@ -10,7 +10,7 @@ FUSEL   = 0xfd
 FUSEX   = 0xff
 
 CFLAGS  = -I. -Wall -Os -flto
-CFLAGS += -DDBGPRINT
+#CFLAGS += -DDBGPRINT
 
 LFLAGS  = -Wl,--relax -flto
 #LFLAGS += -u vfprintf -lprintf_min
