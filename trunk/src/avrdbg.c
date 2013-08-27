@@ -6,7 +6,7 @@
 #include <avr/power.h>
 #include <avr/pgmspace.h>
 
-#include "avr_serial.h"
+#include "avrdbg.h"
 #include "hw_setup.h"
 
 #define BAUD 57600

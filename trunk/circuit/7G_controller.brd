@@ -1842,7 +1842,7 @@ design rules under a new name.</description>
 <element name="R2" library="rcl" package="R0805" value="470R" x="15.9512" y="53.11" rot="R90"/>
 <element name="R3" library="rcl" package="R0805" value="470R" x="11.9825" y="53.1075" rot="R90"/>
 <element name="R4" library="rcl" package="R0805" value="470R" x="13.97" y="53.11" rot="R90"/>
-<element name="AVR_JTAG" library="KileParts" package="AVR-JTAG" value="AVR-JTAG" x="15.875" y="66.3575" rot="MR270"/>
+<element name="AVR_JTAG" library="KileParts" package="AVR-JTAG" value="AVR-JTAG" x="15.5575" y="8.255" rot="R270"/>
 <element name="C6" library="rcl" package="C0805" value="100nF" x="33.655" y="10.16"/>
 <element name="T1" library="KileParts" package="SO8" value="TPS1101D" x="57.4675" y="34.925" rot="R180"/>
 <element name="SJ1" library="jumper" package="SJ" value="" x="56.1975" y="26.035"/>
@@ -1858,7 +1858,6 @@ design rules under a new name.</description>
 <contactref element="R1" pad="2"/>
 <contactref element="AVR_ISP" pad="VCC"/>
 <contactref element="MTRX_CONN" pad="4"/>
-<contactref element="ATMEGA169PV" pad="61"/>
 <contactref element="UART" pad="+5V"/>
 <contactref element="AVR_JTAG" pad="P$4"/>
 <wire x1="32.86125" y1="64.135" x2="31.75" y2="64.135" width="0.254" layer="1"/>
@@ -1882,12 +1881,7 @@ design rules under a new name.</description>
 <wire x1="40.79875" y1="14.9225" x2="40.79875" y2="15.08125" width="0.254" layer="16"/>
 <via x="40.79875" y="15.08125" extent="1-16" drill="0.6" shape="square"/>
 <wire x1="40.79875" y1="15.08125" x2="37.43875" y2="15.08125" width="0.254" layer="1"/>
-<wire x1="10" y1="57.58375" x2="13.335" y2="57.58375" width="0.254" layer="1"/>
-<wire x1="13.335" y1="57.58375" x2="27.175" y2="57.58375" width="0.254" layer="1"/>
-<wire x1="24.99" y1="16.425" x2="24.99" y2="11.1125" width="0.254" layer="1"/>
-<wire x1="24.99" y1="11.1125" x2="21.59" y2="11.1125" width="0.254" layer="1"/>
-<wire x1="21.59" y1="11.1125" x2="21.59" y2="6.6675" width="0.254" layer="1"/>
-<wire x1="13.335" y1="65.0875" x2="13.335" y2="57.58375" width="0.254" layer="1"/>
+<wire x1="10" y1="57.58375" x2="27.175" y2="57.58375" width="0.254" layer="1"/>
 <wire x1="34.925" y1="65.405" x2="36.83" y2="65.405" width="0.254" layer="16"/>
 <wire x1="36.83" y1="65.405" x2="36.83" y2="56.515" width="0.254" layer="16"/>
 <wire x1="36.83" y1="56.515" x2="33.49625" y2="56.515" width="0.254" layer="16"/>
@@ -1907,25 +1901,21 @@ design rules under a new name.</description>
 <contactref element="T1" pad="2"/>
 <contactref element="SJ1" pad="1"/>
 <contactref element="C7" pad="1"/>
-<wire x1="30.48" y1="15.24" x2="30.48" y2="6.985" width="0.254" layer="1"/>
-<wire x1="30.48" y1="6.985" x2="30.48" y2="6.6675" width="0.254" layer="1"/>
-<wire x1="30.48" y1="6.6675" x2="21.59" y2="6.6675" width="0.254" layer="1"/>
-<wire x1="32.705" y1="6.985" x2="30.48" y2="6.985" width="0.254" layer="1"/>
-<wire x1="30.48" y1="4.445" x2="30.48" y2="6.6675" width="0.254" layer="1"/>
 <wire x1="49.8475" y1="4.445" x2="41.5925" y2="4.445" width="0.254" layer="1"/>
-<wire x1="41.5925" y1="4.445" x2="30.48" y2="4.445" width="0.254" layer="1"/>
 <wire x1="41.5925" y1="15.08125" x2="41.5925" y2="10.16" width="0.254" layer="1"/>
 <wire x1="41.5925" y1="10.16" x2="41.5925" y2="4.445" width="0.254" layer="1"/>
 <wire x1="41.2225" y1="10.19125" x2="40.9575" y2="10.19125" width="0.254" layer="1"/>
 <wire x1="40.9575" y1="10.19125" x2="40.9575" y2="10.16" width="0.254" layer="1"/>
 <wire x1="40.9575" y1="10.16" x2="41.5925" y2="10.16" width="0.254" layer="1"/>
-<wire x1="30.48" y1="15.24" x2="32.19" y2="15.24" width="0.254" layer="1"/>
-<wire x1="32.19" y1="15.24" x2="32.19" y2="16.425" width="0.254" layer="1"/>
+<wire x1="41.5925" y1="4.445" x2="32.705" y2="4.445" width="0.254" layer="1"/>
+<wire x1="32.705" y1="4.445" x2="32.705" y2="6.985" width="0.254" layer="1"/>
 <wire x1="58.1025" y1="37.525" x2="58.13125" y2="45.0675" width="0" layer="19" extent="1-1"/>
 <wire x1="59.3725" y1="37.525" x2="58.1025" y2="37.525" width="0" layer="19" extent="1-1"/>
 <wire x1="56.8325" y1="37.525" x2="58.1025" y2="37.525" width="0" layer="19" extent="1-1"/>
 <wire x1="55.4355" y1="26.035" x2="56.8325" y2="37.525" width="0" layer="19" extent="1-1"/>
 <wire x1="55.88" y1="17.425" x2="55.4355" y2="26.035" width="0" layer="19" extent="1-1"/>
+<wire x1="24.99" y1="16.425" x2="31.4325" y2="19.20875" width="0" layer="19" extent="1-1"/>
+<wire x1="18.0975" y1="6.985" x2="24.99" y2="16.425" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="GND">
 <contactref element="ATMEGA169PV" pad="22"/>
@@ -1965,14 +1955,6 @@ design rules under a new name.</description>
 <wire x1="52.705" y1="32.22625" x2="52.705" y2="32.54375" width="0.254" layer="16"/>
 <wire x1="52.705" y1="32.54375" x2="42.38625" y2="32.54375" width="0.254" layer="16"/>
 <via x="42.38625" y="32.54375" extent="1-16" drill="0.6" shape="square"/>
-<wire x1="35.40125" y1="60.6425" x2="35.40125" y2="57.785" width="0.254" layer="1"/>
-<wire x1="10.795" y1="65.0875" x2="12.065" y2="66.3575" width="0.254" layer="16"/>
-<wire x1="12.065" y1="66.3575" x2="19.685" y2="66.3575" width="0.254" layer="16"/>
-<wire x1="19.685" y1="66.3575" x2="20.955" y2="65.0875" width="0.254" layer="16"/>
-<wire x1="20.955" y1="58.42" x2="27.94" y2="58.42" width="0.254" layer="1"/>
-<wire x1="27.94" y1="58.42" x2="27.94" y2="57.785" width="0.254" layer="1"/>
-<wire x1="27.94" y1="57.785" x2="35.40125" y2="57.785" width="0.254" layer="1"/>
-<wire x1="20.955" y1="65.0875" x2="20.955" y2="58.42" width="0.254" layer="1"/>
 <contactref element="C5" pad="-"/>
 <contactref element="C6" pad="2"/>
 <wire x1="34.605" y1="10.16" x2="34.605" y2="13.335" width="0.254" layer="1"/>
@@ -1994,10 +1976,12 @@ design rules under a new name.</description>
 <wire x1="35.40125" y1="32.54375" x2="38.57375" y2="32.54375" width="0.254" layer="1"/>
 <wire x1="38.57375" y1="32.54375" x2="38.57375" y2="33.9725" width="0.254" layer="1"/>
 <wire x1="42.38625" y1="32.54375" x2="38.57375" y2="32.54375" width="0.254" layer="1"/>
-<wire x1="35.40125" y1="57.785" x2="35.40125" y2="45.085" width="0.254" layer="1"/>
+<wire x1="35.40125" y1="60.6425" x2="35.40125" y2="45.085" width="0.254" layer="1"/>
 <wire x1="35.40125" y1="45.085" x2="36.98625" y2="45.085" width="0.254" layer="1"/>
 <wire x1="36.98625" y1="45.085" x2="36.98625" y2="43.4975" width="0.254" layer="1"/>
 <wire x1="58.13125" y1="42.0675" x2="55.5625" y2="37.525" width="0" layer="19" extent="1-1"/>
+<wire x1="20.6375" y1="6.985" x2="25.79" y2="16.425" width="0" layer="19" extent="1-1"/>
+<wire x1="10.4775" y1="6.985" x2="20.6375" y2="6.985" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="MOSI">
 <contactref element="NRF24L01" pad="MOSI"/>
@@ -2068,67 +2052,27 @@ design rules under a new name.</description>
 <wire x1="29.845" y1="33.81375" x2="32.385" y2="33.81375" width="0.254" layer="16"/>
 <wire x1="29.845" y1="62.865" x2="25.88" y2="62.865" width="0.254" layer="1"/>
 <wire x1="25.88" y1="62.865" x2="25.88" y2="63.49" width="0.254" layer="1"/>
-<wire x1="15.875" y1="65.0875" x2="15.875" y2="61.595" width="0.254" layer="1"/>
-<wire x1="15.875" y1="61.595" x2="19.685" y2="61.595" width="0.254" layer="1"/>
-<wire x1="19.685" y1="61.595" x2="19.685" y2="66.3575" width="0.254" layer="1"/>
-<wire x1="19.685" y1="66.3575" x2="24.13" y2="66.3575" width="0.254" layer="1"/>
-<wire x1="24.13" y1="66.3575" x2="24.13" y2="63.49" width="0.254" layer="1"/>
-<wire x1="24.13" y1="63.49" x2="25.88" y2="63.49" width="0.254" layer="1"/>
+<wire x1="15.5575" y1="6.985" x2="32.19" y2="32.025" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="TCK">
 <contactref element="ATMEGA169PV" pad="57"/>
 <contactref element="AVR_JTAG" pad="P$1"/>
-<wire x1="28.99" y1="16.425" x2="28.99" y2="12.75" width="0.254" layer="1"/>
-<wire x1="28.99" y1="12.75" x2="29.5" y2="12.75" width="0.254" layer="1"/>
-<via x="29.5" y="12.75" extent="1-16" drill="0.6" shape="square"/>
-<wire x1="29.5" y1="12.75" x2="27.3175" y2="12.75" width="0.254" layer="16"/>
-<wire x1="27.3175" y1="12.75" x2="27.3175" y2="69.365" width="0.254" layer="16"/>
-<via x="7.25" y="69.6825" extent="1-16" drill="0.6" shape="square"/>
-<wire x1="7.25" y1="69.6825" x2="10.795" y2="69.6825" width="0.254" layer="1"/>
-<wire x1="10.795" y1="67.6275" x2="10.795" y2="69.6825" width="0.254" layer="1"/>
-<wire x1="27.3175" y1="69.365" x2="7.25" y2="69.365" width="0.254" layer="16"/>
-<wire x1="7.25" y1="69.365" x2="7.25" y2="69.6825" width="0.254" layer="16"/>
+<wire x1="20.6375" y1="9.525" x2="28.99" y2="16.425" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="TMS">
 <contactref element="ATMEGA169PV" pad="56"/>
 <contactref element="AVR_JTAG" pad="P$5"/>
-<wire x1="28.19" y1="16.425" x2="28.19" y2="8.5725" width="0.254" layer="1"/>
-<wire x1="28.19" y1="8.5725" x2="26.3525" y2="8.5725" width="0.254" layer="1"/>
-<via x="26.3525" y="8.5725" extent="1-16" drill="0.6" shape="square"/>
-<wire x1="26.3525" y1="8.5725" x2="25.4" y2="8.5725" width="0.254" layer="16"/>
-<wire x1="25.4" y1="8.5725" x2="25.4" y2="58.42" width="0.254" layer="16"/>
-<wire x1="25.4" y1="58.42" x2="17.145" y2="58.42" width="0.254" layer="16"/>
-<wire x1="17.145" y1="58.42" x2="17.145" y2="62.865" width="0.254" layer="16"/>
-<via x="17.145" y="62.865" extent="1-16" drill="0.6" shape="square"/>
-<wire x1="17.145" y1="62.865" x2="17.145" y2="66.3575" width="0.254" layer="1"/>
-<wire x1="17.145" y1="66.3575" x2="15.875" y2="67.6275" width="0.254" layer="1"/>
+<wire x1="15.5575" y1="9.525" x2="28.19" y2="16.425" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="TDO">
 <contactref element="ATMEGA169PV" pad="55"/>
 <contactref element="AVR_JTAG" pad="P$3"/>
-<wire x1="27.39" y1="16.425" x2="27.39" y2="9.8425" width="0.254" layer="1"/>
-<wire x1="27.39" y1="9.8425" x2="22.86" y2="9.8425" width="0.254" layer="1"/>
-<via x="22.86" y="9.8425" extent="1-16" drill="0.6" shape="square"/>
-<wire x1="22.86" y1="9.8425" x2="24.4475" y2="9.8425" width="0.254" layer="16"/>
-<wire x1="24.4475" y1="9.8425" x2="24.4475" y2="57.4675" width="0.254" layer="16"/>
-<wire x1="24.4475" y1="57.4675" x2="14.605" y2="57.4675" width="0.254" layer="16"/>
-<wire x1="14.605" y1="57.4675" x2="14.605" y2="62.5475" width="0.254" layer="16"/>
-<via x="14.605" y="62.5475" extent="1-16" drill="0.6" shape="square"/>
-<wire x1="14.605" y1="62.5475" x2="14.605" y2="66.3575" width="0.254" layer="1"/>
-<wire x1="14.605" y1="66.3575" x2="13.335" y2="67.6275" width="0.254" layer="1"/>
+<wire x1="18.0975" y1="9.525" x2="27.39" y2="16.425" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="TDI">
 <contactref element="ATMEGA169PV" pad="54"/>
 <contactref element="AVR_JTAG" pad="P$9"/>
-<via x="24.75" y="68.25" extent="1-16" drill="0.6" shape="square"/>
-<wire x1="24.75" y1="68.25" x2="26.5" y2="68.25" width="0.254" layer="16"/>
-<wire x1="26.5" y1="68.25" x2="26.5" y2="11" width="0.254" layer="16"/>
-<via x="26.5" y="11" extent="1-16" drill="0.6" shape="square"/>
-<wire x1="26.5" y1="11" x2="26.59" y2="11" width="0.254" layer="1"/>
-<wire x1="26.59" y1="11" x2="26.59" y2="16.425" width="0.254" layer="1"/>
-<wire x1="20.955" y1="67.6275" x2="23.1775" y2="67.6275" width="0.254" layer="1"/>
-<wire x1="23.1775" y1="67.6275" x2="23.1775" y2="68.25" width="0.254" layer="1"/>
-<wire x1="23.1775" y1="68.25" x2="24.75" y2="68.25" width="0.254" layer="1"/>
+<wire x1="10.4775" y1="9.525" x2="26.59" y2="16.425" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="LEDSCRL">
 <contactref element="MTRX_CONN" pad="5"/>

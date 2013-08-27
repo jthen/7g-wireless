@@ -9,7 +9,6 @@
 #include "matrix.h"
 #include "led.h"
 #include "utils.h"
-#include "avr_serial.h"
 
 // this is our watch
 // not 100% accurate, but serves the purpose
