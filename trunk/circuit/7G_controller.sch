@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="6.4">
+<eagle version="6.5.0">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -840,6 +840,75 @@ Source: http://www.analog.com/UploadedFiles/Data_Sheets/703465986AD8611_2_0.pdf<
 <wire x1="-5.715" y1="18.415" x2="5.715" y2="18.415" width="0.127" layer="21"/>
 <wire x1="5.715" y1="18.415" x2="5.715" y2="-0.635" width="0.127" layer="21"/>
 </package>
+<package name="JACK_FEMALE_3.5MM_TRANSPARENT">
+<wire x1="0" y1="0" x2="0" y2="2.5" width="0.127" layer="21"/>
+<wire x1="0" y1="2.5" x2="0" y2="8.89" width="0.127" layer="21"/>
+<wire x1="0" y1="8.89" x2="0" y2="11.43" width="0.127" layer="21"/>
+<wire x1="0" y1="11.43" x2="13.97" y2="11.43" width="0.127" layer="21"/>
+<wire x1="13.97" y1="11.43" x2="13.97" y2="0" width="0.127" layer="21"/>
+<wire x1="13.97" y1="0" x2="0" y2="0" width="0.127" layer="21"/>
+<wire x1="0" y1="8.89" x2="-3.175" y2="8.89" width="0.127" layer="21"/>
+<wire x1="-3.175" y1="8.89" x2="-3.175" y2="2.5" width="0.127" layer="21"/>
+<wire x1="-3.175" y1="2.5" x2="0" y2="2.5" width="0.127" layer="21"/>
+<pad name="NC2" x="13" y="1.3" drill="1.5" diameter="2.5"/>
+<pad name="MIDDLE" x="9.7" y="10.6" drill="1.5" diameter="2.5"/>
+<pad name="NC1" x="8.8" y="8" drill="1.5" diameter="2.5"/>
+<pad name="GND" x="1.8" y="5.715" drill="1.5" diameter="2.5" shape="octagon"/>
+<pad name="TIP" x="6" y="1" drill="1.5" diameter="2.5"/>
+<text x="0.5" y="7.12" size="1" layer="21">GND</text>
+<text x="5" y="2.12" size="1" layer="21">TIP</text>
+<text x="3" y="10.12" size="1" layer="21">MIDDLE</text>
+</package>
+<package name="JACK_FEMALE_3.5MM_BLACK">
+<wire x1="-6.35" y1="-6.35" x2="-6.35" y2="-2.54" width="0.127" layer="21"/>
+<wire x1="-6.35" y1="-2.54" x2="-6.35" y2="2.54" width="0.127" layer="21"/>
+<wire x1="-6.35" y1="2.54" x2="-6.35" y2="6.35" width="0.127" layer="21"/>
+<wire x1="-6.35" y1="6.35" x2="5.08" y2="6.35" width="0.127" layer="21"/>
+<wire x1="5.08" y1="6.35" x2="5.08" y2="-6.35" width="0.127" layer="21"/>
+<wire x1="5.08" y1="-6.35" x2="-6.35" y2="-6.35" width="0.127" layer="21"/>
+<wire x1="-6.35" y1="2.54" x2="-10.16" y2="2.54" width="0.127" layer="21"/>
+<wire x1="-10.16" y1="2.54" x2="-10.16" y2="-2.54" width="0.127" layer="21"/>
+<wire x1="-10.16" y1="-2.54" x2="-6.35" y2="-2.54" width="0.127" layer="21"/>
+<pad name="TIP" x="2.54" y="-5.08" drill="1.1" diameter="2"/>
+<pad name="NC1" x="2.54" y="-2.54" drill="1.1" diameter="2"/>
+<pad name="NC2" x="2.54" y="2.54" drill="1.1" diameter="2"/>
+<pad name="MIDDLE" x="2.54" y="5.08" drill="1.1" diameter="2"/>
+<pad name="GND" x="-2.54" y="0" drill="1.1" diameter="2" shape="octagon"/>
+<text x="-5.08" y="1.27" size="1.27" layer="25">GND</text>
+<text x="5.08" y="5.08" size="1.27" layer="25">MIDDLE</text>
+<text x="5.08" y="-6.35" size="1.27" layer="25">TIP</text>
+<hole x="-2.54" y="-5.08" drill="1"/>
+<hole x="-2.54" y="5.08" drill="1"/>
+<hole x="2.54" y="0" drill="1"/>
+</package>
+<package name="JACK_CHEAP">
+<description>&lt;b&gt;Jack connectors according to JISC 6560, 3.5 mm&lt;/b&gt;&lt;p&gt;
+Klinkensteckverbinder nach JISC 6560, 3,5 mm&lt;br&gt;
+Source: http://www.lumberg.com/Produkte/PDFs/1503_08.pdf</description>
+<wire x1="-3.4" y1="3.4" x2="3.4" y2="3.4" width="0.2032" layer="21"/>
+<wire x1="3.4" y1="3.4" x2="3.4" y2="2" width="0.2032" layer="21"/>
+<wire x1="3.4" y1="2" x2="3.4" y2="-1.4" width="0.2032" layer="51"/>
+<wire x1="3.4" y1="-1.4" x2="3.4" y2="-6.5" width="0.2032" layer="21"/>
+<wire x1="3.4" y1="-6.5" x2="3.4" y2="-7.9" width="0.2032" layer="51"/>
+<wire x1="3.4" y1="-7.9" x2="2.1" y2="-7.9" width="0.2032" layer="51"/>
+<wire x1="2.1" y1="-7.9" x2="-2.1" y2="-7.9" width="0.2032" layer="21"/>
+<wire x1="-2.1" y1="-7.9" x2="-3.4" y2="-7.9" width="0.2032" layer="51"/>
+<wire x1="-3.4" y1="-7.9" x2="-3.4" y2="-6.55" width="0.2032" layer="51"/>
+<wire x1="-3.4" y1="-6.55" x2="-3.4" y2="-1.4" width="0.2032" layer="21"/>
+<wire x1="-3.4" y1="-1.4" x2="-3.4" y2="2" width="0.2032" layer="51"/>
+<wire x1="-3.4" y1="2" x2="-3.4" y2="3.4" width="0.2032" layer="21"/>
+<wire x1="-3.1" y1="5.9" x2="3.1" y2="5.9" width="0.2032" layer="21"/>
+<wire x1="-3.1" y1="3.5" x2="-3.1" y2="5.9" width="0.2032" layer="21"/>
+<wire x1="3.1" y1="3.5" x2="3.1" y2="5.9" width="0.2032" layer="21"/>
+<pad name="1" x="-2.9" y="-8" drill="1" shape="long" rot="R90"/>
+<pad name="4" x="2.9" y="-8" drill="1" shape="long" rot="R90"/>
+<pad name="2" x="-3.2" y="0.3" drill="1" shape="long" rot="R90"/>
+<pad name="3" x="3.2" y="0.3" drill="1" shape="long" rot="R90"/>
+<text x="-4.452" y="-8.812" size="1.27" layer="25" rot="R90">&gt;NAME</text>
+<text x="5.088" y="-8.812" size="1.27" layer="27" rot="R90">&gt;VALUE</text>
+<hole x="0" y="1.46" drill="1.2"/>
+<hole x="0" y="-5.5" drill="1.2"/>
+</package>
 </packages>
 <symbols>
 <symbol name="NRF24L01_MOD_NINE_EAGLES">
@@ -1073,6 +1142,16 @@ Source: http://www.analog.com/UploadedFiles/Data_Sheets/703465986AD8611_2_0.pdf<
 <text x="1.524" y="-1.143" size="0.8636" layer="93">2</text>
 <pin name="2" x="2.54" y="0" visible="off" length="point" direction="pas" swaplevel="1" rot="R180"/>
 <pin name="1" x="-2.54" y="0" visible="off" length="point" direction="pas" swaplevel="1"/>
+</symbol>
+<symbol name="JACK_FEMALE_35MM">
+<wire x1="-7.62" y1="10.16" x2="5.08" y2="10.16" width="0.254" layer="94"/>
+<wire x1="5.08" y1="10.16" x2="5.08" y2="-5.08" width="0.254" layer="94"/>
+<wire x1="5.08" y1="-5.08" x2="-7.62" y2="-5.08" width="0.254" layer="94"/>
+<wire x1="-7.62" y1="-5.08" x2="-7.62" y2="10.16" width="0.254" layer="94"/>
+<pin name="MIDDLE" x="-12.7" y="2.54" visible="pin" length="middle"/>
+<pin name="GND" x="-12.7" y="-2.54" visible="pin" length="middle"/>
+<pin name="TIP" x="-12.7" y="7.62" visible="pin" length="middle"/>
+<text x="-7.62" y="11.43" size="1.6764" layer="95">&gt;NAME</text>
 </symbol>
 </symbols>
 <devicesets>
@@ -1540,6 +1619,43 @@ Source: avr.lbr</description>
 <connects>
 <connect gate="G$1" pin="1" pad="1"/>
 <connect gate="G$1" pin="2" pad="4"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="JACK_FEMALE_3.5MM">
+<gates>
+<gate name="G$1" symbol="JACK_FEMALE_35MM" x="0" y="-2.54"/>
+</gates>
+<devices>
+<device name="TRANSPARENT" package="JACK_FEMALE_3.5MM_TRANSPARENT">
+<connects>
+<connect gate="G$1" pin="GND" pad="GND"/>
+<connect gate="G$1" pin="MIDDLE" pad="MIDDLE"/>
+<connect gate="G$1" pin="TIP" pad="TIP"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="BLACK" package="JACK_FEMALE_3.5MM_BLACK">
+<connects>
+<connect gate="G$1" pin="GND" pad="GND"/>
+<connect gate="G$1" pin="MIDDLE" pad="MIDDLE"/>
+<connect gate="G$1" pin="TIP" pad="TIP"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="CHEAP" package="JACK_CHEAP">
+<connects>
+<connect gate="G$1" pin="GND" pad="1"/>
+<connect gate="G$1" pin="MIDDLE" pad="4"/>
+<connect gate="G$1" pin="TIP" pad="2 3"/>
 </connects>
 <technologies>
 <technology name=""/>
@@ -13885,6 +14001,8 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 <part name="T1" library="KileParts" deviceset="TPS1101D" device=""/>
 <part name="SJ1" library="jumper" deviceset="SJ" device=""/>
 <part name="C7" library="rcl" deviceset="C-EU" device="C0805" value="100nF"/>
+<part name="DBG_JACK" library="KileParts" deviceset="JACK_FEMALE_3.5MM" device="CHEAP"/>
+<part name="GND6" library="SparkFun" deviceset="GND" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -13912,8 +14030,8 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 <instance part="GND5" gate="1" x="-55.88" y="40.64"/>
 <instance part="P+7" gate="1" x="147.32" y="0"/>
 <instance part="UART" gate="1" x="43.18" y="-25.4" rot="MR180"/>
-<instance part="P+10" gate="1" x="63.5" y="-20.32"/>
-<instance part="GND7" gate="1" x="63.5" y="-35.56"/>
+<instance part="P+10" gate="1" x="58.42" y="-20.32"/>
+<instance part="GND7" gate="1" x="58.42" y="-35.56"/>
 <instance part="C5" gate="G$1" x="147.32" y="45.72"/>
 <instance part="R2" gate="G$1" x="132.08" y="-7.62"/>
 <instance part="R3" gate="G$1" x="114.3" y="-2.54"/>
@@ -13930,6 +14048,8 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 </instance>
 <instance part="SJ1" gate="1" x="-86.36" y="35.56"/>
 <instance part="C7" gate="G$1" x="-22.86" y="81.28"/>
+<instance part="DBG_JACK" gate="G$1" x="91.44" y="-30.48"/>
+<instance part="GND6" gate="1" x="73.66" y="-38.1"/>
 </instances>
 <busses>
 <bus name="H28,H27,H25,H22,H21,H20,H19,H18">
@@ -14000,8 +14120,8 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 </segment>
 <segment>
 <pinref part="UART" gate="1" pin="TX"/>
-<wire x1="50.8" y1="-25.4" x2="63.5" y2="-25.4" width="0.1524" layer="91"/>
-<wire x1="63.5" y1="-25.4" x2="63.5" y2="-20.32" width="0.1524" layer="91"/>
+<wire x1="50.8" y1="-25.4" x2="58.42" y2="-25.4" width="0.1524" layer="91"/>
+<wire x1="58.42" y1="-25.4" x2="58.42" y2="-20.32" width="0.1524" layer="91"/>
 <pinref part="P+10" gate="1" pin="VCC"/>
 </segment>
 <segment>
@@ -14094,8 +14214,8 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 </segment>
 <segment>
 <pinref part="UART" gate="1" pin="RX"/>
-<wire x1="50.8" y1="-27.94" x2="63.5" y2="-27.94" width="0.1524" layer="91"/>
-<wire x1="63.5" y1="-27.94" x2="63.5" y2="-33.02" width="0.1524" layer="91"/>
+<wire x1="50.8" y1="-27.94" x2="58.42" y2="-27.94" width="0.1524" layer="91"/>
+<wire x1="58.42" y1="-27.94" x2="58.42" y2="-33.02" width="0.1524" layer="91"/>
 <pinref part="GND7" gate="1" pin="GND"/>
 </segment>
 <segment>
@@ -14113,6 +14233,12 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 <pinref part="C5" gate="G$1" pin="-"/>
 <pinref part="GND8" gate="1" pin="GND"/>
 <wire x1="147.32" y1="38.1" x2="147.32" y2="40.64" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="DBG_JACK" gate="G$1" pin="GND"/>
+<wire x1="78.74" y1="-33.02" x2="73.66" y2="-33.02" width="0.1524" layer="91"/>
+<pinref part="GND6" gate="1" pin="GND"/>
+<wire x1="73.66" y1="-33.02" x2="73.66" y2="-35.56" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="MOSI" class="0">
@@ -14245,9 +14371,15 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 <net name="N$29" class="0">
 <segment>
 <pinref part="ATMEGA169PV" gate="G$1" pin="(RXD/PCINT0)PE0"/>
-<wire x1="53.34" y1="-10.16" x2="53.34" y2="-20.32" width="0.1524" layer="91"/>
+<wire x1="53.34" y1="-10.16" x2="53.34" y2="-12.7" width="0.1524" layer="91"/>
 <pinref part="UART" gate="1" pin="GND"/>
+<wire x1="53.34" y1="-12.7" x2="53.34" y2="-20.32" width="0.1524" layer="91"/>
 <wire x1="50.8" y1="-20.32" x2="53.34" y2="-20.32" width="0.1524" layer="91"/>
+<pinref part="DBG_JACK" gate="G$1" pin="MIDDLE"/>
+<wire x1="78.74" y1="-27.94" x2="63.5" y2="-27.94" width="0.1524" layer="91"/>
+<wire x1="63.5" y1="-27.94" x2="63.5" y2="-12.7" width="0.1524" layer="91"/>
+<wire x1="63.5" y1="-12.7" x2="53.34" y2="-12.7" width="0.1524" layer="91"/>
+<junction x="53.34" y="-12.7"/>
 </segment>
 </net>
 <net name="N$30" class="0">
@@ -14257,6 +14389,13 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 <wire x1="55.88" y1="-7.62" x2="55.88" y2="-22.86" width="0.1524" layer="91"/>
 <pinref part="UART" gate="1" pin="+5V"/>
 <wire x1="55.88" y1="-22.86" x2="50.8" y2="-22.86" width="0.1524" layer="91"/>
+<pinref part="DBG_JACK" gate="G$1" pin="TIP"/>
+<wire x1="78.74" y1="-22.86" x2="76.2" y2="-22.86" width="0.1524" layer="91"/>
+<wire x1="76.2" y1="-22.86" x2="76.2" y2="-15.24" width="0.1524" layer="91"/>
+<wire x1="76.2" y1="-15.24" x2="68.58" y2="-15.24" width="0.1524" layer="91"/>
+<wire x1="68.58" y1="-15.24" x2="68.58" y2="-7.62" width="0.1524" layer="91"/>
+<wire x1="68.58" y1="-7.62" x2="55.88" y2="-7.62" width="0.1524" layer="91"/>
+<junction x="55.88" y="-7.62"/>
 </segment>
 </net>
 <net name="IRQ" class="0">
