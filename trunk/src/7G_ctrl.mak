@@ -1,8 +1,8 @@
 TARGET  = 7G_ctrl
 DEVICE  = atmega169p
-#F_CPU   = 1000000
-F_CPU   = 3686400
-AVRDUDE = avrdude -c dragon_isp -P usb -B2 -p $(DEVICE)
+F_CPU   = 1000000
+#F_CPU   = 3686400
+AVRDUDE = avrdude -c dragon_isp -P usb -p $(DEVICE)
 
 # fuses for the ATmega169PV
 FUSEH   = 0x91
