@@ -903,7 +903,6 @@ Source: http://www.lumberg.com/Produkte/PDFs/1503_08.pdf</description>
 <pad name="2" x="-3.2" y="0.3" drill="1" shape="long" rot="R90"/>
 <pad name="3" x="3.2" y="0.3" drill="1" shape="long" rot="R90"/>
 <text x="-4.452" y="-8.812" size="1.27" layer="25" rot="R90">&gt;NAME</text>
-<text x="5.088" y="-8.812" size="1.27" layer="27" rot="R90">&gt;VALUE</text>
 <hole x="0" y="1.46" drill="1.2"/>
 <hole x="0" y="-5.5" drill="1.2"/>
 </package>
