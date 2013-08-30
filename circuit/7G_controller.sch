@@ -780,7 +780,8 @@ Source: http://www.analog.com/UploadedFiles/Data_Sheets/703465986AD8611_2_0.pdf<
 <wire x1="-3.5" y1="-1.6" x2="-4" y2="-1.6" width="0.127" layer="21"/>
 <wire x1="-4" y1="-1.6" x2="-4" y2="1.6" width="0.127" layer="21"/>
 <text x="-4.1275" y="2.8575" size="1.27" layer="21">&gt;NAME</text>
-<circle x="2.75" y="0" radius="0.70710625" width="0.127" layer="21"/>
+<circle x="2.75" y="0" radius="0.3" width="0.127" layer="21"/>
+<rectangle x1="-4" y1="-1.6" x2="-3.45" y2="1.6" layer="21"/>
 </package>
 <package name="QUARTZ">
 <description>&lt;b&gt;CRYSTAL&lt;/b&gt;</description>

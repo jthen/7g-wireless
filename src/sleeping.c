@@ -72,12 +72,15 @@ void init_sleep(void)
 {
 	// we need to wake up quick (the internal 1MHz RC would probably be a better option)
 	set_sleep_mode(SLEEP_MODE_IDLE);
-	
+
 	// config the wake-up timer
 	TCCR2A = _BV(WGM21) | _BV(WGM20)	// CTC mode
 				| _BV(CS22) | _BV(CS21) | _BV(CS20);	// 1024 prescaler
 														// TCNT=277.78us  OVF=71.11ms
 
+	// we are running Timer2 from the 32kHz crystal
+	//ASSR = _BV(AS2);
+	
 	TIMSK2 = _BV(TOIE2);	// interrupt on overflow
 }
 
@@ -134,17 +137,17 @@ uint8_t dyn_sleep_ticks = 0;
 uint8_t sleep_ticks_prescaler = 0;
 
 #define MIN_SLEEP_TICKS		0x01
-#define MAX_SLEEP_TICKS		0xff
+#define MAX_SLEEP_TICKS		0x10
 
 void sleep_dynamic(void)
 {
-	sleep_ticks_prescaler ++;
+	++sleep_ticks_prescaler;
 	
 	if (sleep_ticks_prescaler == 4)
 	{
 		sleep_ticks_prescaler = 0;
 		if (dyn_sleep_ticks < MAX_SLEEP_TICKS)
-			dyn_sleep_ticks ++;
+			++dyn_sleep_ticks;
 	}
 
 	sleep_ticks(dyn_sleep_ticks);
