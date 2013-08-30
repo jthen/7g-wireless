@@ -21,6 +21,7 @@
 #include "keycode.h"
 #include "sleeping.h"
 #include "ctrl_settings.h"
+#include "calib_32kHz.h"
 
 void process_normal(void)
 {
@@ -53,9 +54,7 @@ void process_normal(void)
 			if (is_pressed(KC_F6))		report.consumer |= _BV(FN_NEXT_TRACK_BIT);
 
 			if (is_pressed(KC_ESC))
-			{
 				waiting_for_all_keys_up = true;
-			}
 
 		} else {
 		
@@ -140,17 +139,17 @@ void send_text(const char* msg, bool is_flash, bool wait_for_finish)
 		// query the free space of the buffer on the dongle to see if
 		// it is large enough to store the next chunk
 
-		for (;;)
-		{
+		do {
+			// wait a little
 			sleep_dynamic();
 			
+			// send an empty text message; this causes the dongle to respond with ACK payload
+			// that contains the number of bytes available in the dongle's text buffer
 			rf_ctrl_send_message(&txt_msg, 1);
-
-			rf_ctrl_process_ack_payloads(&msg_bytes_free, NULL);
 			
-			if (msg_bytes_free > chunklen + 1)
-				break;
-		}
+			// read the number of bytes 
+			rf_ctrl_process_ack_payloads(&msg_bytes_free, NULL);
+		} while (msg_bytes_free < chunklen + 1);
 		
 		// send the message
 		rf_ctrl_send_message(&txt_msg, chunklen + 1);
@@ -173,7 +172,7 @@ void send_text(const char* msg, bool is_flash, bool wait_for_finish)
 }
 
 // returns the battery voltage in 10mV units
-// for instance: get_battery_voltage() returning 278 means voltage == 2.78V
+// for instance: get_battery_voltage() returning 278 equals a voltage of 2.78V
 uint16_t get_battery_voltage(void)
 {
 	power_adc_enable();
@@ -359,17 +358,40 @@ void process_menu(void)
 	start_led_sequence(led_seq_pulse_off);
 }
 
+// this was used to calibrate the RC oscillator
+void test_clock(void)
+{
+	// make a pause to know there to put the logic analyzer marker
+	PORTE = 0;
+	_delay_us(15);
+	PORTE = 1;
+
+	// each line takes 10 clock cycles
+	// so from the first to the last low-to-hi is exactly 100 cycles
+	PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1;
+	PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1;
+	PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1;
+	PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1;
+	PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1;
+	PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1;
+	PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1;
+	PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1;
+	PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1;
+	PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1;
+}
+
 void init_hw(void)
 {
 	// power down everything we don't need
-	power_adc_disable();	// power on/off in get_battery_voltage()
+	power_adc_disable();	// get_battery_voltage() turns this back on and off again
 	power_lcd_disable();
 	//power_spi_disable();	// maybe we should power this off when not in use?
 	power_timer1_disable();
 	power_usart0_disable();	// init_serial() will power on the USART if called
 	SetBit(ACSR, ACD);		// analog comparator off
 	
-	CLKPR = 0;
+	OSCCAL = 90;			// RC oscillator calibration done externally
+							// for now, just hard-code it to this value
 	
 	// default all pins to input with pullups
 	DDRA = 0;	PORTA = 0xff;
@@ -380,9 +402,11 @@ void init_hw(void)
 	DDRF = 0;	PORTF = 0xff;
 	DDRG = 0;	PORTG = 0xff;
 	
-	//DDRE = _BV(0) | _BV(1);	// !!!
-	//PORTE = 0;
+	// PE0 and PE1 are used for execution timing and debugging
+	// Note: these are UART RX (PE0) and TX (PE1) pins
 	
+	DDRE = _BV(0) | _BV(1);
+
 	matrix_init();
 	rf_ctrl_init();
 	init_leds();
@@ -399,7 +423,7 @@ int main(void)
 	sei();		// enable interrupts
 
 	// dprint("i live...\n");
-
+	
 	for (;;)
 	{
 		process_normal();

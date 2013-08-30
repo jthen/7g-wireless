@@ -1,16 +1,18 @@
 TARGET  = 7G_ctrl
 DEVICE  = atmega169p
-F_CPU   = 1000000
-#F_CPU   = 3686400
+
+# we calibrate the RC oscillator to this frequency with the 32KHz crystal
+F_CPU   = 921600
+
 AVRDUDE = avrdude -c dragon_isp -P usb -p $(DEVICE)
 
 # fuses for the ATmega169PV
 FUSEH   = 0x91
-FUSEL   = 0xfd
+FUSEL   = 0x62
 FUSEX   = 0xff
 
-CFLAGS  = -I. -Wall -Os -flto
-#CFLAGS += -DDBGPRINT
+CFLAGS	= -I. -Wall -Os -flto
+CFLAGS += -DDBGPRINT
 
 LFLAGS  = -Wl,--relax -flto
 #LFLAGS += -u vfprintf -lprintf_min
