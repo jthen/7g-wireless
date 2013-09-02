@@ -14,7 +14,7 @@
 #include "sleeping.h"
 #include "ctrl_settings.h"
 
-//#define NRF_CHECK_MODULE
+#define NRF_CHECK_MODULE
 
 void rf_ctrl_init(void)
 {
@@ -47,7 +47,8 @@ void rf_ctrl_init(void)
 		//printf("nRF_=%02x %02x %02x %02x %02x\n", nRF_data[1], nRF_data[2], nRF_data[3], nRF_data[4], nRF_data[5]);
 		
 		// toggle the CAPS LED forever
-		for (;;)
+		uint8_t c;
+		for (c = 0; c < 10; ++c)
 		{
 			TogBit(PORT(LED_CAPS_PORT), LED_CAPS_BIT);
 
