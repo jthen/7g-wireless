@@ -27,9 +27,6 @@ void wait_for_matrix_change(void);
 
 uint16_t get_seconds(void);
 
-uint16_t get_thword(void);
-uint16_t get_tlword(void);
-
 // these return the number of seconds since reset (with overflow)
 uint32_t get_seconds32(void);
 uint16_t get_seconds(void);
