@@ -28,7 +28,7 @@ struct
 uint32_t get_seconds32(void)
 {
 	uint32_t ret_val = watch.tcnt2_vhbyte;
-	ret_val <= 16;
+	ret_val <<= 16;
 	ret_val |= watch.tcnt2_hword;
 	ret_val <<= 4;
 	ret_val |= (watch.tcnt2_lword >> 12);
