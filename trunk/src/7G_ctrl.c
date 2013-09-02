@@ -21,7 +21,7 @@
 #include "keycode.h"
 #include "sleeping.h"
 #include "ctrl_settings.h"
-#include "calib_32kHz.h"
+//#include "calib_32kHz.h"
 
 void process_normal(void)
 {
@@ -57,7 +57,7 @@ void process_normal(void)
 				waiting_for_all_keys_up = true;
 
 		} else {
-		
+
 			uint8_t row, col;
 			for (row = 0; row < NUM_ROWS; ++row)
 			{
@@ -82,10 +82,16 @@ void process_normal(void)
 		bool is_sent;
 		const uint8_t MAX_SEND_RETRY = 10;
 		uint8_t drop_cnt = 0;
+		TogBit(PORTG, LED_CAPS_BIT);
 		do {
 			is_sent = rf_ctrl_send_message(&report, num_keys + 3);
 			if (!is_sent)
+			{
 				++drop_cnt;
+				TogBit(PORTG, LED_SCRL_BIT);
+			} else {
+				TogBit(PORTG, LED_NUML_BIT);
+			}
 
 			// flush the ACK payloads
 			rf_ctrl_process_ack_payloads(NULL, NULL);
@@ -400,13 +406,15 @@ void init_hw(void)
 	DDRD = 0;	PORTD = 0xff;
 	DDRE = 0;	PORTE = 0xff;
 	DDRF = 0;	PORTF = 0xff;
-	DDRG = 0;	PORTG = 0xff;
+	DDRG = 0b111;	PORTG = 0xff;
 	
 	// PE0 and PE1 are used for execution timing and debugging
 	// Note: these are UART RX (PE0) and TX (PE1) pins
 	
 	DDRE = _BV(0) | _BV(1);
 
+	_delay_ms(5000);
+	
 	matrix_init();
 	rf_ctrl_init();
 	init_leds();
