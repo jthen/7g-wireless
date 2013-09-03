@@ -14,7 +14,10 @@
 #include "sleeping.h"
 #include "ctrl_settings.h"
 
-#define NRF_CHECK_MODULE
+// plugging in AVR Dragon's ISP cable will cause the nRF module check to fail,
+// even if the nRF works without problems.
+// the reason is the pull-up on the the dragon's MISO line. oh well...
+//#define NRF_CHECK_MODULE
 
 void rf_ctrl_init(void)
 {
@@ -47,8 +50,9 @@ void rf_ctrl_init(void)
 		//printf("nRF_=%02x %02x %02x %02x %02x\n", nRF_data[1], nRF_data[2], nRF_data[3], nRF_data[4], nRF_data[5]);
 		
 		// toggle the CAPS LED forever
-		uint8_t c;
-		for (c = 0; c < 10; ++c)
+		//uint8_t c;
+		//for (c = 0; c < 10; ++c)
+		for (;;)
 		{
 			TogBit(PORT(LED_CAPS_PORT), LED_CAPS_BIT);
 
@@ -84,9 +88,9 @@ bool rf_ctrl_send_message(const void* buff, const uint8_t num_bytes)
 
 	nRF_CE_hi();	// signal the transceiver to send the packet
 
-	sleep_ticks(3);	// 3*277.78 = 833.34us
+	sleep_ticks(3);
 	while (PIN(NRF_IRQ_PORT) & _BV(NRF_IRQ_BIT))
-		sleep_ticks(1);	// 277.78
+		sleep_ticks(1);
 
 	nRF_CE_lo();
 

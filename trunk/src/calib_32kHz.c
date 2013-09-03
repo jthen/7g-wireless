@@ -207,3 +207,26 @@ void CalibrateRC(void)
 #endif
 #endif
 }
+
+
+// this was used to calibrate the RC oscillator
+void test_clock(void)
+{
+	// make a pause to know there to put the logic analyzer marker
+	PORTE = 0;
+	_delay_us(15);
+	PORTE = 1;
+
+	// each line takes 10 clock cycles
+	// so from the first to the last low-to-hi is exactly 100 cycles
+	PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1;
+	PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1;
+	PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1;
+	PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1;
+	PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1;
+	PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1;
+	PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1;
+	PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1;
+	PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1;
+	PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1;
+}
