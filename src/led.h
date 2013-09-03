@@ -4,11 +4,8 @@
 void init_leds(void);
 
 // initializes the Timer0 used for LED PWM
-// and turns on the necessary leds
+// and turns on the selected LEDs
 void set_leds(uint8_t new_led_status, uint8_t num_cycles);
-
-// turns off the PWM timer and shuts the LEDs off
-void clear_leds(void);
 
 // returns true if the PWM counter is running
 bool are_leds_on(void);

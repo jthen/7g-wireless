@@ -29,6 +29,7 @@ const __flash uint8_t matrix2keycode[NUM_ROWS][NUM_COLS] =
 };
 
 uint8_t matrix[NUM_ROWS];
+uint8_t matrix_keys_pressed = 0;	// contains the number of keys that are pressed
 
 void matrix_init(void)
 {
@@ -42,16 +43,18 @@ bool matrix_scan(void)
 	bool has_changes = false;
 	uint8_t row, col;
 
+	matrix_keys_pressed = 0;	// no keys are pressed
+	
 	// config ports D and A as outputs and drive them low
 	DDRD = 0xff;	PORTD = 0x00;
 	DDRA = 0xff;	PORTA = 0x00;
 
+	_delay_us(3);	// wait a little for the output levels to stabilize
+	
 	// first we want to know if any keys are pressed.
 	// most of the time no key will be pressed,
 	// so there's no reason to waste time scaning the entire matrix bit by bit
-	
-	_delay_us(3);	// wait a little for the levels to stabilize
-	
+
 	// are none of the keys pressed?
 	if (PINC == 0xff)
 	{
@@ -64,7 +67,7 @@ bool matrix_scan(void)
 				has_changes = true;
 			}
 		}
-		
+
 	} else {
 
 		// at least one key is pressed - find out which one(s)
@@ -75,7 +78,7 @@ bool matrix_scan(void)
 				PORTA = ~_BV(row), PORTD = 0xff;
 			else
 				PORTA = 0xff, PORTD = ~_BV(row - 8);
-			
+
 			// we have to wait a little for the levels to stabilize
 			_delay_us(3);
 			
@@ -89,6 +92,10 @@ bool matrix_scan(void)
 				bool curr_state = cols & _BV(col);
 				bool prev_state = matrix[row] & _BV(col);
 				
+				// increment the number of keys pressed
+				if (curr_state)
+					++matrix_keys_pressed;
+
 				// update the matrix if needed
 				if (curr_state != prev_state)
 				{

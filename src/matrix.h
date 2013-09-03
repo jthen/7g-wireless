@@ -4,7 +4,11 @@
 #define	NUM_ROWS		16
 #define	NUM_COLS		8
 
+// the state keyboard matrix bit map
 extern uint8_t matrix[NUM_ROWS];
+
+// contains the number of keys that were pressed during to the last matrix scan
+extern uint8_t matrix_keys_pressed;
 
 void matrix_init(void);
 bool matrix_scan(void);

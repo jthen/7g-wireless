@@ -101,8 +101,6 @@ void add_ticks(uint16_t ticks)
 			++watch.tcnt2_vhbyte;
 
 		++watch.tcnt2_hword;
-
-		//TogBit(PORTE, 1);
 	}
 	
 	watch.tcnt2_lword += ticks;
@@ -115,7 +113,6 @@ ISR(TIMER2_OVF_vect)
 // sleep for sleep_ticks number of TCNT2 ticks
 void sleep_ticks(uint8_t ticks)
 {
-//SetBit(PORTE, 0);
 	if (are_leds_on())
 	{
 		uint8_t prev_ticks = TCNT2;
@@ -127,13 +124,14 @@ void sleep_ticks(uint8_t ticks)
 	} else {
 		sleep_enable();
 		add_ticks(TCNT2);
-		TCNT2 = 0xff - ticks;		// set the sleep duration
-		loop_until_bit_is_clear(ASSR, TCN2UB);
+		
+		TCNT2 = 0xff - ticks;					// set the sleep duration
+		loop_until_bit_is_clear(ASSR, TCN2UB);	// wait for the update
+		
 		add_ticks(ticks);
 		sleep_mode();				// go to sleep
 		sleep_disable();
 	}
-//ClrBit(PORTE, 0);
 }
 
 uint8_t dyn_sleep_ticks = 0;

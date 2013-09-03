@@ -45,7 +45,7 @@ void process_normal(void)
 		{
 			are_all_keys_up = false;
 			
-			// set the bits of the consumer byte
+			// set the bits of the consumer byte (media keys)
 			if (is_pressed(KC_F1))		report.consumer |= _BV(FN_MUTE_BIT);
 			if (is_pressed(KC_F2))		report.consumer |= _BV(FN_VOL_DOWN_BIT);
 			if (is_pressed(KC_F3))		report.consumer |= _BV(FN_VOL_UP_BIT);
@@ -53,7 +53,8 @@ void process_normal(void)
 			if (is_pressed(KC_F5))		report.consumer |= _BV(FN_PREV_TRACK_BIT);
 			if (is_pressed(KC_F6))		report.consumer |= _BV(FN_NEXT_TRACK_BIT);
 
-			if (is_pressed(KC_ESC))
+			// if only Func and Esc are pressed
+			if (is_pressed(KC_ESC)  &&  matrix_keys_pressed == 2)
 				waiting_for_all_keys_up = true;
 
 		} else {
@@ -82,16 +83,10 @@ void process_normal(void)
 		bool is_sent;
 		const uint8_t MAX_SEND_RETRY = 10;
 		uint8_t drop_cnt = 0;
-		TogBit(PORTG, LED_CAPS_BIT);
 		do {
 			is_sent = rf_ctrl_send_message(&report, num_keys + 3);
 			if (!is_sent)
-			{
 				++drop_cnt;
-				TogBit(PORTG, LED_SCRL_BIT);
-			} else {
-				TogBit(PORTG, LED_NUML_BIT);
-			}
 
 			// flush the ACK payloads
 			rf_ctrl_process_ack_payloads(NULL, NULL);
@@ -177,6 +172,9 @@ void send_text(const char* msg, bool is_flash, bool wait_for_finish)
 	}
 }
 
+// defining this makes the ADC use the two least significant bits, but adds 24 bytes to the binary
+#define PREC_BATT_VOLTAGE
+
 // returns the battery voltage in 10mV units
 // for instance: get_battery_voltage() returning 278 equals a voltage of 2.78V
 uint16_t get_battery_voltage(void)
@@ -184,9 +182,11 @@ uint16_t get_battery_voltage(void)
 	power_adc_enable();
 	
 	ADMUX = _B0(REFS1) | _B0(REFS0)	// reference AVCC
-			| _B1(ADLAR)			// left adjust ADC
+#ifndef PREC_BATT_VOLTAGE	
+			| _B1(ADLAR)			// left adjust ADC - drops the two LSBs
+#endif
 			| 0b11110;				// measure 1.1v internal reference
-			
+
 	ADCSRA = _BV(ADEN)					// enable ADC
 			| _BV(ADPS2) | _BV(ADPS1) | _BV(ADPS0)	// prescaler 128
 			| _BV(ADSC);				// start conversion
@@ -195,7 +195,11 @@ uint16_t get_battery_voltage(void)
 	loop_until_bit_is_set(ADCSRA, ADIF);
 
 	// remember the result
+#ifdef PREC_BATT_VOLTAGE
+	uint16_t adc_result = ADC;
+#else	
 	uint8_t adc_result = ADCH;
+#endif
 	
 	// clear the ADIF bit by writing one
 	SetBit(ADCSRA, ADIF);
@@ -204,7 +208,11 @@ uint16_t get_battery_voltage(void)
 	
 	power_adc_disable();	// ADC power off
 	
+#ifdef PREC_BATT_VOLTAGE
+	return 112640 / adc_result;
+#else
 	return 28050 / adc_result;
+#endif
 }
 
 // makes a battery voltage string in the 2.34V format
@@ -271,13 +279,14 @@ void process_menu(void)
 	while (!exit_menu)
 	{
 		// welcome & version
-		send_text(PSTR("\x01" "7G wireless\n"
+		send_text(PSTR("\x01"	// translates to Ctrl-A on the dongle
+						"7G wireless\n"
 						"firmware build " __DATE__ "  " __TIME__ "\n"
 						"battery voltage: "), true, false);
 
 		get_battery_voltage_str(string_buff);
 		send_text(string_buff, false, false);
-
+		
 		// output the time since reset
 		uint16_t days;
 		uint8_t hours, minutes, seconds;
@@ -286,19 +295,19 @@ void process_menu(void)
 		
 		itoa(days, string_buff, 10);
 		send_text(string_buff, false, false);
-		send_text(PSTR("days "), true, false);
+		send_text(PSTR(" days "), true, false);
 
 		itoa(hours, string_buff, 10);
 		send_text(string_buff, false, false);
-		send_text(PSTR("hour "), true, false);
+		send_text(PSTR(" hours "), true, false);
 
 		itoa(minutes, string_buff, 10);
 		send_text(string_buff, false, false);
-		send_text(PSTR("min "), true, false);
+		send_text(PSTR(" minutes "), true, false);
 
 		itoa(seconds, string_buff, 10);
 		send_text(string_buff, false, false);
-		send_text(PSTR("sec\n"), true, false);
+		send_text(PSTR(" seconds\n"), true, false);
 		
 		// menu
 		send_text(PSTR("\n\nwhat do you want to do?\n"
@@ -313,17 +322,31 @@ void process_menu(void)
 		
 		send_text(PSTR("F2 - change LED brightness (current "), true, false);
 		
-		itoa(get_led_brightness(), string_buff, 10);
+		uint8_t fcnt;
+		for (fcnt = 0; fcnt < sizeof led_brightness_lookup; ++fcnt)
+		{
+			if (led_brightness_lookup[fcnt] == get_led_brightness())
+			{
+				string_buff[0] = 'F';
+				itoa(fcnt + 1, string_buff + 1, 10);
+				break;
+			}
+		}
+		
+		// no match found in the loop?
+		if (fcnt == sizeof led_brightness_lookup)
+			itoa(get_led_brightness(), string_buff, 10);
+
 		send_text(string_buff, false, false);
 		
 		send_text(PSTR(")\nEsc - exit menu\n\n"), true, false);
 
 		do {
 			keycode = get_key_input();
-			
+
+			send_text(PSTR("\nvoltage new "), true, false);
 			get_battery_voltage_str(string_buff);
 			send_text(string_buff, false, false);
-			send_text("\n", false, false);
 			
 		} while (keycode != KC_F1  &&  keycode != KC_F2  &&  keycode != KC_ESC);
 
@@ -357,33 +380,10 @@ void process_menu(void)
 			
 		} else if (keycode == KC_ESC) {
 			exit_menu = true;
+			start_led_sequence(led_seq_pulse_off);
 			send_text(PSTR("\nexiting menu, you can type now\n"), true, true);
 		}
 	}
-
-	start_led_sequence(led_seq_pulse_off);
-}
-
-// this was used to calibrate the RC oscillator
-void test_clock(void)
-{
-	// make a pause to know there to put the logic analyzer marker
-	PORTE = 0;
-	_delay_us(15);
-	PORTE = 1;
-
-	// each line takes 10 clock cycles
-	// so from the first to the last low-to-hi is exactly 100 cycles
-	PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1;
-	PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1;
-	PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1;
-	PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1;
-	PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1;
-	PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1;
-	PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1;
-	PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1;
-	PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1;
-	PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1; PORTE = 0; PORTE = 1;
 }
 
 void init_hw(void)
@@ -406,15 +406,13 @@ void init_hw(void)
 	DDRD = 0;	PORTD = 0xff;
 	DDRE = 0;	PORTE = 0xff;
 	DDRF = 0;	PORTF = 0xff;
-	DDRG = 0b111;	PORTG = 0xff;
+	DDRG = 0;	PORTG = 0xff;
 	
-	// PE0 and PE1 are used for execution timing and debugging
+	// PE0 and PE1 are used for timing and debugging
 	// Note: these are UART RX (PE0) and TX (PE1) pins
 	
-	DDRE = _BV(0) | _BV(1);
+	//DDRE = _BV(0) | _BV(1);
 
-	_delay_ms(5000);
-	
 	matrix_init();
 	rf_ctrl_init();
 	init_leds();
@@ -430,7 +428,10 @@ int main(void)
 
 	sei();		// enable interrupts
 
-	// dprint("i live...\n");
+	// 'play' a LED sequence while waiting for the 32KHz crystal to stabilize
+	start_led_sequence(led_seq_succ_and_return);
+	while (are_leds_on())
+		;
 	
 	for (;;)
 	{

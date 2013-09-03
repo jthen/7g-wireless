@@ -75,6 +75,12 @@ void init_leds(void)
 	TIMSK0 = _B1(OCIE0A) | _B1(TOIE0);
 }
 
+void start_led_timer(void)
+{
+	// start the timer
+	TCCR0A = _BV(CS01) | _BV(CS00);		// normal mode, prescaler 64
+}
+
 void set_leds(uint8_t new_led_status, uint8_t num_cycles)
 {
 	// remember the status
@@ -97,20 +103,8 @@ void set_leds(uint8_t new_led_status, uint8_t num_cycles)
 
 		turn_on_leds();
 		
-		// start the timer
-		TCCR0A = _B1(WGM00) | _B1(WGM01)				// fast PWM mode
-				//| _B0(CS02) | _B1(CS01) | _B1(CS00);	// prescaler 64
-				| _B1(CS02) | _B0(CS01) | _B0(CS00);	// prescaler 256  0.6944us TCNT, 17.78 ms cycle
-				//| _B1(CS02) | _B0(CS01) | _B1(CS00);	// prescaler 1024
+		start_led_timer();
 	}
-}
-
-void clear_leds(void)
-{
-	// stop the timer
-	TCCR0A = 0;
-
-	turn_off_leds();
 }
 
 bool are_leds_on(void)
@@ -138,23 +132,27 @@ void start_led_sequence(const __flash led_sequence_t* seq)
 		TCNT0 = 0;
 
 		turn_on_leds();
-		
-		// start the timer
-		TCCR0A = _B1(WGM00) | _B1(WGM01)				// fast PWM mode
-				//| _B0(CS02) | _B1(CS01) | _B1(CS00);	// prescaler 64
-				| _B1(CS02) | _B0(CS01) | _B0(CS00);	// prescaler 256  0.6944us TCNT, 17.78 ms cycle
-				//| _B1(CS02) | _B0(CS01) | _B1(CS00);	// prescaler 1024
+
+		start_led_timer();
 	}
 }
 
 // LED sequences
 const __flash led_sequence_t led_seq_succ_and_return[] = 
 {
-	{1, 20, 1, 0},
-	{4, 20, 1, 0},
-	{2, 20, 1, 0},
-	{4, 20, 1, 0},
-	{1, 20, 1, 0},
+	{1, 10, 90, 0},
+	{4, 10, 90, 0},
+	{2, 10, 90, 0},
+	{4, 10, 90, 0},
+	{1, 10, 90, 0},
+	{4, 10, 90, 0},
+	{2, 10, 90, 0},
+	{4, 10, 90, 0},
+	{1, 10, 90, 0},
+	{4, 10, 90, 0},
+	{2, 10, 90, 0},
+	{4, 10, 90, 0},
+	{1, 10, 90, 0},
 	
 	{0,0,0,0},
 };
