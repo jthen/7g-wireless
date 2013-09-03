@@ -1,24 +1,13 @@
 #pragma once
 
-enum timer2_prescaler {
-
-SLEEP_PRESCALER_64		= _BV(CS22),
-SLEEP_PRESCALER_128		= _BV(CS22) | _BV(CS20),
-SLEEP_PRESCALER_256		= _BV(CS22) | _BV(CS21),
-SLEEP_PRESCALER_1024	= _BV(CS22) | _BV(CS21) | _BV(CS20),
-
-};
-
-
-// sets the default prescaler and inits the hardware
+// inits the Timer0 as an async timer clocked by a 32KHz crystal on TOSC1/2
 void init_sleep(void);
 
 // sleep for for a variable amount of time
 // the time to sleep depends on time since last matrix change
 void sleep_dynamic(void);
 
-// sleep for the number of Timer0 counter cycles with a 64 prescaler
-// This will be sleep_cnt*17.36us on a 3.6864MHz F_CPU
+// sleep for the number of Timer0 counter cycles
 void sleep_ticks(uint8_t sleep_cnt);
 
 void wait_for_all_keys_up(void);
@@ -33,3 +22,10 @@ uint16_t get_seconds(void);
 
 // returns the time since reset
 void get_time(uint16_t* days, uint8_t* hours, uint8_t* minutes, uint8_t* seconds);
+
+// used to setup sleep schedule
+typedef struct 
+{
+	uint16_t	duration_sec;
+	uint8_t		num_ticks;		// 0xff means deep sleep
+} sleep_schedule_period_t;

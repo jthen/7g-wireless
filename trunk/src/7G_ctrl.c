@@ -21,7 +21,6 @@
 #include "keycode.h"
 #include "sleeping.h"
 #include "ctrl_settings.h"
-//#include "calib_32kHz.h"
 
 void process_normal(void)
 {
@@ -293,13 +292,19 @@ void process_menu(void)
 		get_time(&days, &hours, &minutes, &seconds);
 		send_text(PSTR("\nkeyboard's been on for "), true, false);
 		
-		itoa(days, string_buff, 10);
-		send_text(string_buff, false, false);
-		send_text(PSTR(" days "), true, false);
+		if (days)
+		{
+			itoa(days, string_buff, 10);
+			send_text(string_buff, false, false);
+			send_text(PSTR(" days "), true, false);
+		}
 
-		itoa(hours, string_buff, 10);
-		send_text(string_buff, false, false);
-		send_text(PSTR(" hours "), true, false);
+		if (hours)
+		{
+			itoa(hours, string_buff, 10);
+			send_text(string_buff, false, false);
+			send_text(PSTR(" hours "), true, false);
+		}
 
 		itoa(minutes, string_buff, 10);
 		send_text(string_buff, false, false);
@@ -344,9 +349,8 @@ void process_menu(void)
 		do {
 			keycode = get_key_input();
 
-			send_text(PSTR("\nvoltage new "), true, false);
-			get_battery_voltage_str(string_buff);
-			send_text(string_buff, false, false);
+			// get_battery_voltage_str(string_buff);
+			// send_text(string_buff, false, false);
 			
 		} while (keycode != KC_F1  &&  keycode != KC_F2  &&  keycode != KC_ESC);
 
@@ -429,7 +433,7 @@ int main(void)
 	sei();		// enable interrupts
 
 	// 'play' a LED sequence while waiting for the 32KHz crystal to stabilize
-	start_led_sequence(led_seq_succ_and_return);
+	start_led_sequence(led_seq_boot);
 	while (are_leds_on())
 		;
 	

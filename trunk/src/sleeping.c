@@ -38,7 +38,11 @@ uint32_t get_seconds32(void)
 
 uint16_t get_seconds(void)
 {
-	return (uint16_t) get_seconds32();
+	uint16_t ret_val = watch.tcnt2_hword;
+	ret_val <<= 4;
+	ret_val |= (watch.tcnt2_lword >> 12);
+
+	return ret_val;
 }
 
 void get_time(uint16_t* days, uint8_t* hours, uint8_t* minutes, uint8_t* seconds)
@@ -133,6 +137,18 @@ void sleep_ticks(uint8_t ticks)
 		sleep_disable();
 	}
 }
+
+const __flash sleep_schedule_period_t sleep_schedule_default[] =
+{
+	{   300,   24},		// 5 minutes, ~6ms refresh
+	{  1800,   30},		// 30 minutes, ~8ms refresh
+	{  1800,   41},		// 30 minutes, ~10ms refresh
+	{0xffff, 0xff},		// forever, deep sleep
+};
+
+const __flash sleep_schedule_period_t* active_sleep_schedule = sleep_schedule_default;
+const __flash sleep_schedule_period_t* curr_sleep_period = sleep_schedule_default;
+uint16_t sleep_period_started = 0;
 
 uint8_t dyn_sleep_ticks = 0;
 uint8_t sleep_ticks_prescaler = 0;
