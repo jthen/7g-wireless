@@ -9,6 +9,7 @@
 #include "matrix.h"
 #include "led.h"
 #include "utils.h"
+#include "avrdbg.h"
 
 // this is our watch
 // not 100% accurate, but serves the purpose
@@ -141,56 +142,62 @@ void sleep_ticks(uint8_t ticks)
 const __flash sleep_schedule_period_t sleep_schedule_default[] =
 {
 	{   300,   24},		// 5 minutes, ~6ms refresh
-	{  1800,   30},		// 30 minutes, ~8ms refresh
-	{  1800,   41},		// 30 minutes, ~10ms refresh
-	{0xffff, 0xff},		// forever, deep sleep
+	{   900,   33},		// 15 minutes, ~8ms refresh
+	{  1800,   82},		// 30 minutes, ~20ms refresh
+	{0xffff,  250},		// forever, ~62ms refresh
 };
 
 const __flash sleep_schedule_period_t* active_sleep_schedule = sleep_schedule_default;
-const __flash sleep_schedule_period_t* curr_sleep_period = sleep_schedule_default;
+const __flash sleep_schedule_period_t* curr_sleep_period;
 uint16_t sleep_period_started = 0;
-
-uint8_t dyn_sleep_ticks = 0;
-uint8_t sleep_ticks_prescaler = 0;
-
-#define MIN_SLEEP_TICKS		0x01
-#define MAX_SLEEP_TICKS		0x10
 
 void sleep_dynamic(void)
 {
-	++sleep_ticks_prescaler;
-	
-	if (sleep_ticks_prescaler == 4)
+	// if the current period is not forever
+	if (curr_sleep_period->duration_sec != 0xffff)
 	{
-		sleep_ticks_prescaler = 0;
-		if (dyn_sleep_ticks < MAX_SLEEP_TICKS)
-			++dyn_sleep_ticks;
+		// get the time elapsed in this period
+		uint16_t curr_seconds = get_seconds();
+		uint16_t sec_elapsed = curr_seconds - sleep_period_started;
+		if (sec_elapsed >= curr_sleep_period->duration_sec)
+		{
+			// advance to the next period
+			++curr_sleep_period;
+			
+			// remember the time
+			sleep_period_started = curr_seconds;
+		}
 	}
 
-	sleep_ticks(dyn_sleep_ticks);
+	sleep_ticks(curr_sleep_period->num_ticks);
 }
 
 void sleep_reset(void)
 {
-	dyn_sleep_ticks = MIN_SLEEP_TICKS;
+	curr_sleep_period = active_sleep_schedule;
+	sleep_period_started = get_seconds();
 }
 
 void wait_for_all_keys_up(void)
 {
 	sleep_reset();
-	do {
-		matrix_scan();
+	matrix_scan();
+	while (get_num_keys_pressed())
+	{
 		sleep_dynamic();
-	} while (is_any_key_pressed());
+		matrix_scan();
+	}
 }
 
 void wait_for_key_down(void)
 {
 	sleep_reset();
-	do {
-		matrix_scan();
+	matrix_scan();
+	while (get_num_keys_pressed() == 0)
+	{
 		sleep_dynamic();
-	} while (!is_any_key_pressed());
+		matrix_scan();
+	}
 }
 
 void wait_for_matrix_change(void)

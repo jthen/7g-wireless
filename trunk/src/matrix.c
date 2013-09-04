@@ -29,7 +29,7 @@ const __flash uint8_t matrix2keycode[NUM_ROWS][NUM_COLS] =
 };
 
 uint8_t matrix[NUM_ROWS];
-uint8_t matrix_keys_pressed = 0;	// contains the number of keys that are pressed
+uint8_t matrix_num_keys_pressed = 0;	// contains the number of keys that are pressed
 
 void matrix_init(void)
 {
@@ -43,7 +43,7 @@ bool matrix_scan(void)
 	bool has_changes = false;
 	uint8_t row, col;
 
-	matrix_keys_pressed = 0;	// no keys are pressed
+	matrix_num_keys_pressed = 0;	// no keys are pressed
 	
 	// config ports D and A as outputs and drive them low
 	DDRD = 0xff;	PORTD = 0x00;
@@ -94,7 +94,7 @@ bool matrix_scan(void)
 				
 				// increment the number of keys pressed
 				if (curr_state)
-					++matrix_keys_pressed;
+					++matrix_num_keys_pressed;
 
 				// update the matrix if needed
 				if (curr_state != prev_state)
@@ -364,7 +364,7 @@ const __flash keycode2matrix_t keycode2matrix[0xe8] =
 	{ 4, 0x02},		// 0xe7  KC_RGUI
 };
 
-bool is_pressed(uint8_t keycode)
+bool is_pressed_keycode(uint8_t keycode)
 {
 	uint8_t row, mask;
 	row = keycode2matrix[keycode].row;
@@ -373,15 +373,7 @@ bool is_pressed(uint8_t keycode)
 	return matrix[row] & mask;
 }
 
-bool is_any_key_pressed(void)
+uint8_t get_num_keys_pressed(void)
 {
-	// check if any key is down
-	uint8_t row;
-	for (row = 0; row < NUM_ROWS; ++row)
-	{
-		if (matrix[row])
-			return true;
-	}
-	
-	return false;
+	return matrix_num_keys_pressed;
 }
