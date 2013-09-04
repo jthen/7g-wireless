@@ -40,20 +40,20 @@ void process_normal(void)
 
 		are_all_keys_up = true;
 		
-		if (is_pressed(KC_FUNC))
+		if (is_pressed_keycode(KC_FUNC))
 		{
 			are_all_keys_up = false;
 			
 			// set the bits of the consumer byte (media keys)
-			if (is_pressed(KC_F1))		report.consumer |= _BV(FN_MUTE_BIT);
-			if (is_pressed(KC_F2))		report.consumer |= _BV(FN_VOL_DOWN_BIT);
-			if (is_pressed(KC_F3))		report.consumer |= _BV(FN_VOL_UP_BIT);
-			if (is_pressed(KC_F4))		report.consumer |= _BV(FN_PLAY_PAUSE_BIT);
-			if (is_pressed(KC_F5))		report.consumer |= _BV(FN_PREV_TRACK_BIT);
-			if (is_pressed(KC_F6))		report.consumer |= _BV(FN_NEXT_TRACK_BIT);
+			if (is_pressed_keycode(KC_F1))		report.consumer |= _BV(FN_MUTE_BIT);
+			if (is_pressed_keycode(KC_F2))		report.consumer |= _BV(FN_VOL_DOWN_BIT);
+			if (is_pressed_keycode(KC_F3))		report.consumer |= _BV(FN_VOL_UP_BIT);
+			if (is_pressed_keycode(KC_F4))		report.consumer |= _BV(FN_PLAY_PAUSE_BIT);
+			if (is_pressed_keycode(KC_F5))		report.consumer |= _BV(FN_PREV_TRACK_BIT);
+			if (is_pressed_keycode(KC_F6))		report.consumer |= _BV(FN_NEXT_TRACK_BIT);
 
 			// if only Func and Esc are pressed
-			if (is_pressed(KC_ESC)  &&  matrix_keys_pressed == 2)
+			if (is_pressed_keycode(KC_ESC)  &&  get_num_keys_pressed() == 2)
 				waiting_for_all_keys_up = true;
 
 		} else {
@@ -63,7 +63,7 @@ void process_normal(void)
 			{
 				for (col = 0; col < NUM_COLS; ++col)
 				{
-					if (matrix[row] & _BV(col))
+					if (is_pressed_matrix(row, col))
 					{
 						are_all_keys_up = false;
 						
@@ -241,7 +241,7 @@ uint8_t get_key_input(void)
 	{
 		for (col = 0; col < NUM_COLS; ++col)
 		{
-			if (matrix[row] & _BV(col))
+			if (is_pressed_matrix(row, col))
 				keycode_pressed = get_keycode(row, col);
 		}
 	}
