@@ -267,15 +267,14 @@ const uint8_t __flash led_brightness_lookup[] =
 	254,	// F12
 };
 
-void process_menu(void)
+bool process_menu(void)
 {
 	start_led_sequence(led_seq_pulse_on);
 	
 	// print the main menu
-	bool exit_menu = false;
 	uint8_t keycode;
 	char string_buff[10];
-	while (!exit_menu)
+	for (;;)
 	{
 		// welcome & version
 		send_text(PSTR("\x01"	// translates to Ctrl-A on the dongle
@@ -319,13 +318,13 @@ void process_menu(void)
 						"F1 - change transmitter output power (current "), true, false);
 		switch (get_nrf_output_power())
 		{
-		case vRF_PWR_M18DBM:	send_text(PSTR("-18dBm)\n"), true, false); 	break;
-		case vRF_PWR_M12DBM:	send_text(PSTR("-12dBm)\n"), true, false); 	break;
-		case vRF_PWR_M6DBM:		send_text(PSTR("-6dBm)\n"), true, false); 		break;
-		case vRF_PWR_0DBM:		send_text(PSTR("0dBm)\n"), true, false); 		break;
+		case vRF_PWR_M18DBM:	send_text(PSTR("-18"), true, false); 	break;
+		case vRF_PWR_M12DBM:	send_text(PSTR("-12"), true, false); 	break;
+		case vRF_PWR_M6DBM:		send_text(PSTR("-6"), true, false); 	break;
+		case vRF_PWR_0DBM:		send_text(PSTR("0"), true, false); 	break;
 		}
 		
-		send_text(PSTR("F2 - change LED brightness (current "), true, false);
+		send_text(PSTR("dBm)\nF2 - change LED brightness (current "), true, false);
 		
 		uint8_t fcnt;
 		for (fcnt = 0; fcnt < sizeof led_brightness_lookup; ++fcnt)
@@ -344,7 +343,7 @@ void process_menu(void)
 
 		send_text(string_buff, false, false);
 		
-		send_text(PSTR(")\nEsc - exit menu\n\n"), true, false);
+		send_text(PSTR(")\nF3 - lock keyboard (unlock with Func+Del+LCtrl)\nEsc - exit menu\n\n"), true, false);
 
 		do {
 			keycode = get_key_input();
@@ -352,7 +351,7 @@ void process_menu(void)
 			// get_battery_voltage_str(string_buff);
 			// send_text(string_buff, false, false);
 			
-		} while (keycode != KC_F1  &&  keycode != KC_F2  &&  keycode != KC_ESC);
+		} while (keycode != KC_F1  &&  keycode != KC_F2  &&  keycode != KC_F3  &&  keycode != KC_ESC);
 
 		if (keycode == KC_F1)
 		{
@@ -382,12 +381,40 @@ void process_menu(void)
 				}
 			} while (keycode != KC_ESC);
 			
+		} else if (keycode == KC_F3) {
+		
+			send_text(PSTR("Keyboard is now LOCKED!!!\nPress Func+Del+LCtrl to unlock\n\n"), true, false);
+			return true;
+
 		} else if (keycode == KC_ESC) {
-			exit_menu = true;
+
 			start_led_sequence(led_seq_pulse_off);
 			send_text(PSTR("\nexiting menu, you can type now\n"), true, true);
+			break;
 		}
 	}
+	
+	return false;
+}
+
+void process_lock(void)
+{
+	start_led_sequence(led_seq_locked);
+
+	for (;;)
+	{
+		sleep_ticks(0xfe);	// long, about ~62ms
+		if (matrix_scan()
+				&&  get_num_keys_pressed() == 3
+				&&  is_pressed_keycode(KC_FUNC)
+				&&  is_pressed_keycode(KC_LCTRL)
+				&&  is_pressed_keycode(KC_DEL))
+		{
+			break;
+		}
+	}
+
+	start_led_sequence(led_seq_unlocked);
 }
 
 void init_hw(void)
@@ -440,7 +467,8 @@ int main(void)
 	for (;;)
 	{
 		process_normal();
-		process_menu();
+		if (process_menu())
+			process_lock();
 	}
 
 	return 0;
