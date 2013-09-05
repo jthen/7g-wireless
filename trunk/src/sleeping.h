@@ -26,6 +26,6 @@ void get_time(uint16_t* days, uint8_t* hours, uint8_t* minutes, uint8_t* seconds
 // used to setup sleep schedule
 typedef struct 
 {
-	uint16_t	duration_sec;
-	uint8_t		num_ticks;		// 0xff means deep sleep
+	uint16_t	duration_sec;	// the duration of this period in the schedule
+	uint8_t		num_ticks;		// number of ticks of sleep between refreshes
 } sleep_schedule_period_t;

@@ -170,3 +170,17 @@ const __flash led_sequence_t led_seq_pulse_off[] =
 
 	{0,0,0,0},
 };
+
+const __flash led_sequence_t led_seq_locked[] =
+{
+	{7,200,201, -1},
+	
+	{0,0,0,0},
+};
+
+const __flash led_sequence_t led_seq_unlocked[] =
+{
+	{7, 40,  1,  6},
+	
+	{0,0,0,0},
+};
