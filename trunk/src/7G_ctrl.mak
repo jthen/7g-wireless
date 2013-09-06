@@ -33,7 +33,7 @@ $(TARGET).hex: $(OBJECTS)
 	avr-size -C --mcu=$(DEVICE) $(TARGET).elf
 
 flash: $(TARGET).hex
-	$(AVRDUDE) -V -U flash:w:$(TARGET).hex:i
+	$(AVRDUDE) -U flash:w:$(TARGET).hex:i
 
 clean:
 	rm -f $(TARGET).hex $(TARGET).elf $(OBJECTS)
