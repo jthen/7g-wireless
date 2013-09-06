@@ -180,9 +180,9 @@ uint16_t get_battery_voltage(void)
 {
 	power_adc_enable();
 	
-	ADMUX = _B0(REFS1) | _B0(REFS0)	// reference AVCC
+	ADMUX = _B0(REFS1) | _B1(REFS0)	// AVCC with external capacitor at AREF pin
 #ifndef PREC_BATT_VOLTAGE	
-			| _B1(ADLAR)			// left adjust ADC - drops the two LSBs
+			| _BV(ADLAR)			// left adjust ADC - drops the two LSBs
 #endif
 			| 0b11110;				// measure 1.1v internal reference
 
