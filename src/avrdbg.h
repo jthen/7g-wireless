@@ -11,4 +11,4 @@ void printi(const uint32_t i);
 # define dprinti(i)
 #endif
 
-void init_serial(void);
+void init_dbg(void);

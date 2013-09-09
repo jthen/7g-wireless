@@ -31,7 +31,7 @@ uint8_t serial_getchar(void)
     return UDR0;
 }
 
-void init_serial(void)
+void init_dbg(void)
 {
 	power_usart0_enable();		// power to the USART
 	

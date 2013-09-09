@@ -70,8 +70,6 @@ void process_text_msg(const uint8_t* recv_buffer, const uint8_t bytes_received)
 	msg_ack.bytes_free = msg_free();
 	msg_ack.bytes_capacity = msg_capacity();
 	rf_dngl_queue_ack_payload(&msg_ack, sizeof msg_ack);
-
-	//dprintf("msg_sz=%i  size=%i  full=%i  empty=%i  free=%i\n", bytes_received, msg_size(), msg_full(), msg_empty(), msg_free());
 }
 
 int	main(void)
@@ -79,7 +77,7 @@ int	main(void)
 	_delay_ms(200);		// wait for the voltage levels to stabilize
 	
 	init_hw();
-	init_serial();
+	init_dbg();
 	rf_dngl_init();
 	vusb_init();
 
@@ -126,13 +124,6 @@ int	main(void)
 			uint8_t c = msg_peek();
 			uint8_t new_keycode = get_keycode_for_char(c);
 
-			/*
-			if (c <= ' ')
-				dprint("   0x%02x\n", c);
-			else
-				dprint("%c  0x%02x\n", c, c);
-			*/
-			
 			// if the keycode is different than the previous
 			// otherwise just send an empty report to simulate key went up
 			if (new_keycode != prev_keycode  ||  new_keycode == KC_NO)
