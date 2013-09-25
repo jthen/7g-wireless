@@ -121,7 +121,7 @@ uint8_t get_keycode(uint8_t row, uint8_t col)
 }
 
 // lookup for keycode -> matrix[] bit position
-// a little wasteful, but we've got plenty of flash
+// a little wasteful in terms of flash space, but we've got plenty of it (flash)
 typedef struct
 {
 	uint8_t		row;
