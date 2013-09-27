@@ -172,6 +172,13 @@ void sleep_dynamic(void)
 	sleep_ticks(curr_sleep_period->num_ticks);
 }
 
+// sleep for the entire sleep period a given number of times
+void sleep_max(uint8_t num_times)
+{
+	while (num_times--)
+		sleep_ticks(0xfe);
+}
+
 void sleep_reset(void)
 {
 	curr_sleep_period = active_sleep_schedule;

@@ -10,6 +10,9 @@ void sleep_dynamic(void);
 // sleep for the number of Timer0 counter cycles
 void sleep_ticks(uint8_t sleep_cnt);
 
+// sleep for the entire sleep period a given number of times
+void sleep_max(uint8_t num_times);
+
 void wait_for_all_keys_up(void);
 void wait_for_key_down(void);
 void wait_for_matrix_change(void);
@@ -29,3 +32,4 @@ typedef struct
 	uint16_t	duration_sec;	// the duration of this period in the schedule
 	uint8_t		num_ticks;		// number of ticks of sleep between refreshes
 } sleep_schedule_period_t;
+

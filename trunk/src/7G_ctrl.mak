@@ -48,3 +48,5 @@ read_fuse:
 
 .c.o:
 	$(COMPILE) -c $< -o $@
+
+all: clean hex
