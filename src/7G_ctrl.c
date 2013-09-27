@@ -140,8 +140,8 @@ void send_text(const char* msg, bool is_flash, bool wait_for_finish)
 		// it is large enough to store the next chunk
 
 		do {
-			// wait a little
-			sleep_dynamic();
+			// wait a little - 5*62ms
+			sleep_max(5);
 			
 			// send an empty text message; this causes the dongle to respond with ACK payload
 			// that contains the number of bytes available in the dongle's text buffer
