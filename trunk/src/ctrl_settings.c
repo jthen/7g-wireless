@@ -7,7 +7,9 @@
 #include "led.h"
 #include "ctrl_settings.h"
 
-#define DEFAULT_LED_BRIGHTNESS		1		// 0 to 254
+#define MIN_LED_BRIGHTNESS			1
+#define MAX_LED_BRIGHTNESS			0xfe
+#define DEFAULT_LED_BRIGHTNESS		MIN_LED_BRIGHTNESS
 
 uint8_t EEMEM led_brightness;
 uint8_t EEMEM nrf_output_power;
@@ -15,7 +17,7 @@ uint8_t EEMEM nrf_output_power;
 uint8_t get_led_brightness(void)
 {
 	uint8_t ret_val = eeprom_read_byte(&led_brightness);
-	if (ret_val == 255)
+	if (ret_val > MAX_LED_BRIGHTNESS)	// if not set yet
 		ret_val = DEFAULT_LED_BRIGHTNESS;
 
 	return ret_val;
@@ -38,8 +40,8 @@ uint8_t get_nrf_output_power(void)
 
 void set_led_brightness(uint8_t new_val)
 {
-	if (new_val == 255)
-		new_val = 254;
+	if (new_val == 0xff)
+		new_val = 0xfe;
 
 	eeprom_update_byte(&led_brightness, new_val);
 	

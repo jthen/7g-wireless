@@ -24,7 +24,9 @@ void start_led_sequence(const __flash led_sequence_t* seq);
 
 // LED sequences
 extern const __flash led_sequence_t led_seq_boot[];
-extern const __flash led_sequence_t led_seq_pulse_on[];
-extern const __flash led_sequence_t led_seq_pulse_off[];
-extern const __flash led_sequence_t led_seq_locked[];
-extern const __flash led_sequence_t led_seq_unlocked[];
+extern const __flash led_sequence_t led_seq_menu_begin[];
+extern const __flash led_sequence_t led_seq_menu_end[];
+extern const __flash led_sequence_t led_seq_lock[];
+
+// LED brightness setting lookup (F1 - F12)
+extern const uint8_t __flash led_brightness_lookup[12];

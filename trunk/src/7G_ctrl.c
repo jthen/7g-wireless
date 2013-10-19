@@ -140,8 +140,7 @@ void send_text(const char* msg, bool is_flash, bool wait_for_finish)
 		// it is large enough to store the next chunk
 
 		do {
-			// wait a little - 5*62ms
-			sleep_max(5);
+			sleep_max(1);	// doze off a little
 			
 			// send an empty text message; this causes the dongle to respond with ACK payload
 			// that contains the number of bytes available in the dongle's text buffer
@@ -251,25 +250,9 @@ uint8_t get_key_input(void)
 	return keycode_pressed;
 }
 
-const uint8_t __flash led_brightness_lookup[] = 
-{
-	1,		// F1
-	3,		// F2
-	5,		// F3
-	8,		// F4
-	13,		// F5
-	20,		// F6
-	30,		// F7
-	50,		// F8
-	80,		// F9
-	120,	// F10
-	190,	// F11
-	254,	// F12
-};
-
 bool process_menu(void)
 {
-	start_led_sequence(led_seq_pulse_on);
+	start_led_sequence(led_seq_menu_begin);
 	
 	// print the main menu
 	uint8_t keycode;
@@ -388,7 +371,7 @@ bool process_menu(void)
 
 		} else if (keycode == KC_ESC) {
 
-			start_led_sequence(led_seq_pulse_off);
+			start_led_sequence(led_seq_menu_end);
 			send_text(PSTR("\nexiting menu, you can type now\n"), true, true);
 			break;
 		}
@@ -399,11 +382,14 @@ bool process_menu(void)
 
 void process_lock(void)
 {
-	start_led_sequence(led_seq_locked);
+	start_led_sequence(led_seq_lock);
 
 	for (;;)
 	{
-		sleep_ticks(0xfe);	// long, about ~62ms
+		sleep_ticks(0xfe);	// long, about 62ms x 3 = 190ms
+		sleep_ticks(0xfe);
+		sleep_ticks(0xfe);
+
 		if (matrix_scan()
 				&&  get_num_keys_pressed() == 3
 				&&  is_pressed_keycode(KC_FUNC)
@@ -414,7 +400,7 @@ void process_lock(void)
 		}
 	}
 
-	start_led_sequence(led_seq_unlocked);
+	start_led_sequence(led_seq_lock);
 }
 
 void init_hw(void)
@@ -424,7 +410,7 @@ void init_hw(void)
 	power_lcd_disable();
 	//power_spi_disable();	// maybe we should power this off when not in use?
 	power_timer1_disable();
-	power_usart0_disable();	// init_serial() will power on the USART if called
+	power_usart0_disable();	// init_dbg() will power on the USART if called
 	SetBit(ACSR, ACD);		// analog comparator off
 	
 	OSCCAL = 90;			// RC oscillator calibration done externally
@@ -449,7 +435,7 @@ void init_hw(void)
 	init_leds();
 	init_sleep();
 #ifdef DBGPRINT	
-	init_serial();
+	init_dbg();
 #endif
 }
 
