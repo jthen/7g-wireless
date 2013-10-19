@@ -9,6 +9,8 @@
 #include "utils.h"
 #include "ctrl_settings.h"
 
+#define USER_BRIGHTNESS		0xff
+
 volatile uint8_t curr_led_status = 0;
 volatile uint8_t cycle_counter;		// duration the LEDs are on
 const __flash led_sequence_t* sequence = 0;
@@ -63,7 +65,7 @@ ISR(TIMER0_COMP_vect)
 			} else {
 				curr_led_status = sequence->led_status & 0x07;
 				cycle_counter = num_cycles;
-				OCR0A = sequence->brightness;
+				OCR0A = sequence->brightness == USER_BRIGHTNESS ? get_led_brightness() : sequence->brightness;
 			}
 		}
 	}
@@ -117,7 +119,7 @@ void start_led_sequence(const __flash led_sequence_t* seq)
 	sequence = seq;
 	
 	// init the PWM duty cycle
-	OCR0A = seq->brightness;
+	OCR0A = sequence->brightness == USER_BRIGHTNESS ? get_led_brightness() : sequence->brightness;
 
 	// set the status
 	curr_led_status = seq->led_status;
@@ -137,22 +139,42 @@ void start_led_sequence(const __flash led_sequence_t* seq)
 	}
 }
 
+
+
 // LED sequences
 const __flash led_sequence_t led_seq_boot[] =
 {
-	{1, 10, 1, 9},
-	{4, 10, 1, 9},
-	{2, 10, 1, 9},
-	{4, 10, 1, 9},
-	{1, 10, 1, 9},
-	{4, 10, 1, 9},
-	{2, 10, 1, 9},
-	{4, 10, 1, 9},
-	{1, 10, 1, 9},
-	{4, 10, 1, 9},
-	{2, 10, 1, 9},
-	{4, 10, 1, 9},
-	{1, 10, 1, 9},
+	{1, 5, USER_BRIGHTNESS, 0},
+	{4, 5, USER_BRIGHTNESS, 0},
+	{2, 5, USER_BRIGHTNESS, 0},
+	{4, 5, USER_BRIGHTNESS, 0},
+	{1, 5, USER_BRIGHTNESS, 0},
+	{4, 5, USER_BRIGHTNESS, 0},
+	{2, 5, USER_BRIGHTNESS, 0},
+	{4, 5, USER_BRIGHTNESS, 0},
+	{1, 5, USER_BRIGHTNESS, 0},
+	{4, 5, USER_BRIGHTNESS, 0},
+	{2, 5, USER_BRIGHTNESS, 0},
+	{4, 5, USER_BRIGHTNESS, 0},
+	{1, 5, USER_BRIGHTNESS, 0},
+	
+	{0,0,0,0},
+};
+
+const __flash led_sequence_t led_seq_menu_begin[] = 
+{
+	{1, 15, USER_BRIGHTNESS, 0},
+	{4, 15, USER_BRIGHTNESS, 0},
+	{2, 15, USER_BRIGHTNESS, 0},
+	
+	{0,0,0,0},
+};
+
+const __flash led_sequence_t led_seq_menu_end[] = 
+{
+	{2, 15, USER_BRIGHTNESS, 0},
+	{4, 15, USER_BRIGHTNESS, 0},
+	{1, 15, USER_BRIGHTNESS, 0},
 	
 	{0,0,0,0},
 };
@@ -171,16 +193,31 @@ const __flash led_sequence_t led_seq_pulse_off[] =
 	{0,0,0,0},
 };
 
-const __flash led_sequence_t led_seq_locked[] =
+const uint8_t __flash led_brightness_lookup[12] = 
 {
-	{7,200,201, -1},
-	
-	{0,0,0,0},
+	1,		// F1
+	3,		// F2
+	5,		// F3
+	8,		// F4
+	13,		// F5
+	20,		// F6
+	30,		// F7
+	50,		// F8
+	80,		// F9
+	120,	// F10
+	190,	// F11
+	254,	// F12
 };
 
-const __flash led_sequence_t led_seq_unlocked[] =
+
+const __flash led_sequence_t led_seq_lock[] =
 {
-	{7, 40,  1,  6},
+	{3,5,USER_BRIGHTNESS, 0},
+	{4,5,USER_BRIGHTNESS, 0},
+	{3,5,USER_BRIGHTNESS, 0},
+	{4,5,USER_BRIGHTNESS, 0},
+	{3,5,USER_BRIGHTNESS, 0},
+	{4,5,USER_BRIGHTNESS, 0},
 	
 	{0,0,0,0},
 };
