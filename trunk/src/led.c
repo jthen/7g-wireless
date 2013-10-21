@@ -163,18 +163,18 @@ const __flash led_sequence_t led_seq_boot[] =
 
 const __flash led_sequence_t led_seq_menu_begin[] = 
 {
-	{1, 15, USER_BRIGHTNESS, 0},
-	{4, 15, USER_BRIGHTNESS, 0},
-	{2, 15, USER_BRIGHTNESS, 0},
+	{1, 5, USER_BRIGHTNESS, 0},
+	{4, 5, USER_BRIGHTNESS, 0},
+	{2, 5, USER_BRIGHTNESS, 0},
 	
 	{0,0,0,0},
 };
 
 const __flash led_sequence_t led_seq_menu_end[] = 
 {
-	{2, 15, USER_BRIGHTNESS, 0},
-	{4, 15, USER_BRIGHTNESS, 0},
-	{1, 15, USER_BRIGHTNESS, 0},
+	{2, 5, USER_BRIGHTNESS, 0},
+	{4, 5, USER_BRIGHTNESS, 0},
+	{1, 5, USER_BRIGHTNESS, 0},
 	
 	{0,0,0,0},
 };
@@ -193,6 +193,16 @@ const __flash led_sequence_t led_seq_pulse_off[] =
 	{0,0,0,0},
 };
 
+const __flash led_sequence_t led_seq_lock[] =
+{
+	{3,5,USER_BRIGHTNESS, 0},
+	{4,5,USER_BRIGHTNESS, 0},
+	
+	{0,0,0,0},
+};
+
+
+// function key to brightness lookup
 const uint8_t __flash led_brightness_lookup[12] = 
 {
 	1,		// F1
@@ -207,17 +217,4 @@ const uint8_t __flash led_brightness_lookup[12] =
 	120,	// F10
 	190,	// F11
 	254,	// F12
-};
-
-
-const __flash led_sequence_t led_seq_lock[] =
-{
-	{3,5,USER_BRIGHTNESS, 0},
-	{4,5,USER_BRIGHTNESS, 0},
-	{3,5,USER_BRIGHTNESS, 0},
-	{4,5,USER_BRIGHTNESS, 0},
-	{3,5,USER_BRIGHTNESS, 0},
-	{4,5,USER_BRIGHTNESS, 0},
-	
-	{0,0,0,0},
 };
