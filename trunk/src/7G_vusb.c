@@ -32,7 +32,7 @@ uint8_t vusb_expect_data = 0;		// used by usbFunctionSetup to send messages to u
 #define CFG_INTERFACE_KEYBOARD_NAME		'7','G',' ','K','e','y','b','o','a','r','d'
 #define CFG_INTERFACE_KEYBOARD_SZ   	11
 
-#define CFG_INTERFACE_CONSUMER_NAME		'7','G',' ','S','o','u','n','d',' ','C','o','n','t','r','o','l'
+#define CFG_INTERFACE_CONSUMER_NAME		'7','G',' ','M','e','d','i','a',' ','C','o','n','t','r','o','l'
 #define CFG_INTERFACE_CONSUMER_SZ   	16
 
 
@@ -74,7 +74,7 @@ const PROGMEM char keyboard_report_descriptor[] =
 	0xc0				// END_COLLECTION
 };
 
-// sound control report
+// media control report
 const PROGMEM char consumer_report_descriptor[] =
 {
 	0x05, 0x0c,			// Usage Page (Consumer Devices)	
