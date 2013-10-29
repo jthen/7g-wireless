@@ -106,9 +106,9 @@ const PROGMEM char consumer_report_descriptor[] =
 const PROGMEM char usbDescriptorConfiguration[] =
 {
 	// Configuration descriptor
-	9,								// sizeof(usbDescriptorConfiguration): length of descriptor in bytes
+	9,								// length of descriptor in bytes
 	USBDESCR_CONFIG,    			// descriptor type
-	9 + (9 + 9 + 7) + (9 + 9 + 7), 0,		// total length of data returned (including inlined descriptors)
+	9 + (9+9+7) + (9+9+7), 0,		// total length of data returned (including inlined descriptors)
 	2,								// number of interfaces in this configuration
 	1,								// index of this configuration
 	0,								// configuration name string index
