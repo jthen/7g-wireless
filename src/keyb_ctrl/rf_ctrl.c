@@ -7,7 +7,7 @@
 #include <avr/pgmspace.h>
 #include <util/delay.h>
 
-#include "nRF24L01.h"
+#include "nRF24L.h"
 #include "rf_protocol.h"
 #include "rf_ctrl.h"
 #include "led.h"
