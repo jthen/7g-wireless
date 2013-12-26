@@ -3,7 +3,7 @@ DEVICE  = atmega328p
 F_CPU   = 12000000
 AVRDUDE = avrdude -c stk500v2 -P avrdoper -B1 -p $(DEVICE)
 
-CFLAGS  = -I. -I../common -Iusbdrv -DIS_DONGLE=1 -flto
+CFLAGS  = -I. -I../common -Iusbdrv -flto
 #CFLAGS += -DDBGPRINT
 
 LFLAGS  = -Wl,--relax -flto
