@@ -3,7 +3,7 @@
 
 #include <avr/eeprom.h>
 
-#include "nRF24L01.h"
+#include "nRF24L.h"
 #include "led.h"
 #include "ctrl_settings.h"
 

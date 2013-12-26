@@ -15,7 +15,7 @@
 #include "utils.h"
 #include "matrix.h"
 #include "led.h"
-#include "nRF24L01.h"
+#include "nRF24L.h"
 #include "rf_protocol.h"
 #include "rf_ctrl.h"
 #include "keycode.h"
