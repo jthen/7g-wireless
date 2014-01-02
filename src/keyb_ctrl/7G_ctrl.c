@@ -269,15 +269,15 @@ bool process_menu(void)
 		send_text(string_buff, false, false);
 
 		// RF stats
-		send_text(PSTR("\nTotal RF packets: "), true, false);
+		send_text(PSTR("\nRF packet stats (total/retransmit/lost): "), true, false);
 		ultoa(rf_packets_total, string_buff, 10);
 		send_text(string_buff, false, false);
-		
-		send_text(PSTR("\nRF packet retransmits: "), true, false);
+
+		send_text(PSTR("/"), true, false);
 		ultoa(arc_total, string_buff, 10);
 		send_text(string_buff, false, false);
-		
-		send_text(PSTR("\nRF packets lost: "), true, false);
+
+		send_text(PSTR("/"), true, false);
 		ultoa(plos_total, string_buff, 10);
 		send_text(string_buff, false, false);
 		
@@ -317,7 +317,7 @@ bool process_menu(void)
 		case vRF_PWR_M18DBM:	send_text(PSTR("-18"), true, false); 	break;
 		case vRF_PWR_M12DBM:	send_text(PSTR("-12"), true, false); 	break;
 		case vRF_PWR_M6DBM:		send_text(PSTR("-6"), true, false); 	break;
-		case vRF_PWR_0DBM:		send_text(PSTR("0"), true, false); 	break;
+		case vRF_PWR_0DBM:		send_text(PSTR("0"), true, false); 		break;
 		}
 		
 		send_text(PSTR("dBm)\nF2 - change LED brightness (current "), true, false);
@@ -339,7 +339,8 @@ bool process_menu(void)
 
 		send_text(string_buff, false, false);
 		
-		send_text(PSTR(")\nF3 - lock keyboard (unlock with Func+Del+LCtrl)\nEsc - exit menu\n\n"), true, false);
+		send_text(PSTR(")\nF3 - lock keyboard (unlock with Func+Del+LCtrl)\n"), true, false);
+		send_text(PSTR("F4 - reset RF packet stats\nEsc - exit menu\n\n"), true, false);
 
 		do {
 			keycode = get_key_input();
@@ -347,7 +348,7 @@ bool process_menu(void)
 			// get_battery_voltage_str(string_buff);
 			// send_text(string_buff, false, false);
 			
-		} while (keycode != KC_F1  &&  keycode != KC_F2  &&  keycode != KC_F3  &&  keycode != KC_ESC);
+		} while (keycode != KC_F1  &&  keycode != KC_F2  &&  keycode != KC_F3  &&  keycode != KC_F4  &&  keycode != KC_ESC);
 
 		if (keycode == KC_F1)
 		{
@@ -382,6 +383,11 @@ bool process_menu(void)
 			send_text(PSTR("Keyboard is now LOCKED!!!\nPress Func+Del+LCtrl to unlock\n\n"), true, false);
 			return true;
 
+		} else if (keycode == KC_F4) {
+
+			// reset the counters to 0
+			plos_total = arc_total = rf_packets_total = 0;
+			
 		} else if (keycode == KC_ESC) {
 
 			start_led_sequence(led_seq_menu_end);
