@@ -60,7 +60,7 @@ void get_time(uint16_t* days, uint8_t* hours, uint8_t* minutes, uint8_t* seconds
 
 void init_sleep(void)
 {
-	// the AVR draws about 6uA in power save sleep mode
+	// the AVR draws about 6uA in power save mode
 	set_sleep_mode(SLEEP_MODE_PWR_SAVE);
 
 	// config the wake-up timer; the timer is set to normal mode
