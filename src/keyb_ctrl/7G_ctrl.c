@@ -86,7 +86,7 @@ void process_normal(void)
 			is_sent = rf_ctrl_send_message(&report, num_keys + 3);
 			if (!is_sent)
 				++drop_cnt;
-
+			
 			// flush the ACK payloads
 			rf_ctrl_process_ack_payloads(NULL, NULL);
 
@@ -144,7 +144,7 @@ void send_text(const char* msg, bool is_flash, bool wait_for_finish)
 			
 			// send an empty text message; this causes the dongle to respond with ACK payload
 			// that contains the number of bytes available in the dongle's text buffer
-			rf_ctrl_send_message(&txt_msg, 1);
+			rf_ctrl_send_message(&txt_msg, 1);	// 1 byte for the message type ID
 			
 			// read the number of bytes 
 			rf_ctrl_process_ack_payloads(&msg_bytes_free, NULL);
@@ -256,7 +256,7 @@ bool process_menu(void)
 	
 	// print the main menu
 	uint8_t keycode;
-	char string_buff[10];
+	char string_buff[16];
 	for (;;)
 	{
 		// welcome & version
@@ -266,6 +266,19 @@ bool process_menu(void)
 						"battery voltage: "), true, false);
 
 		get_battery_voltage_str(string_buff);
+		send_text(string_buff, false, false);
+
+		// RF stats
+		send_text(PSTR("\nTotal RF packets: "), true, false);
+		ultoa(rf_packets_total, string_buff, 10);
+		send_text(string_buff, false, false);
+		
+		send_text(PSTR("\nRF packet retransmits: "), true, false);
+		ultoa(arc_total, string_buff, 10);
+		send_text(string_buff, false, false);
+		
+		send_text(PSTR("\nRF packets lost: "), true, false);
+		ultoa(plos_total, string_buff, 10);
 		send_text(string_buff, false, false);
 		
 		// output the time since reset
@@ -426,7 +439,7 @@ void init_hw(void)
 	DDRG = 0;	PORTG = 0xff;
 	
 	// PE0 and PE1 are used for timing and debugging
-	// Note: these are UART RX (PE0) and TX (PE1) pins
+	// Note: these are the UART RX (PE0) and TX (PE1) pins
 	
 	//DDRE = _BV(0) | _BV(1);
 

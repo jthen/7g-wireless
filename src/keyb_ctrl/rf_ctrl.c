@@ -19,6 +19,9 @@
 // the reason is the pull-up on the the dragon's MISO line. oh well...
 //#define NRF_CHECK_MODULE
 
+// we want to count the lost packets
+uint32_t plos_total, arc_total, rf_packets_total;
+
 void rf_ctrl_init(void)
 {
 	nRF_Init();
@@ -75,6 +78,9 @@ void rf_ctrl_init(void)
 	
 	nRF_WriteReg(STATUS, vRX_DR | vTX_DS | vMAX_RT);	// reset the IRQ flags
 	nRF_WriteReg(RF_CH, CHANNEL_NUM);					// set the channel
+	
+	// reset the the lost packet counters
+	plos_total = arc_total = rf_packets_total = 0;
 }
 
 bool rf_ctrl_send_message(const void* buff, const uint8_t num_bytes)
@@ -100,6 +106,15 @@ bool rf_ctrl_send_message(const void* buff, const uint8_t num_bytes)
 	nRF_FlushTX();
 	nRF_WriteReg(STATUS, vMAX_RT | vTX_DS | vRX_DR);	// reset the status flags
 	nRF_WriteReg(CONFIG, vEN_CRC | vCRCO);				// go to nRF power down
+	
+	if (!ret_val)
+		++plos_total;
+
+	// read the ARC
+	nRF_ReadReg(OBSERVE_TX);
+	arc_total += nRF_data[1] & 0x0f;
+	
+	++rf_packets_total;
 	
 	return ret_val;
 }
