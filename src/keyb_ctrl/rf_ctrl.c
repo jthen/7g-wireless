@@ -94,6 +94,7 @@ bool rf_ctrl_send_message(const void* buff, const uint8_t num_bytes)
 
 	nRF_CE_hi();	// signal the transceiver to send the packet
 
+	// wait for the nRF to signal an event
 	sleep_ticks(3);
 	while (PIN(NRF_IRQ_PORT) & _BV(NRF_IRQ_BIT))
 		sleep_ticks(1);
