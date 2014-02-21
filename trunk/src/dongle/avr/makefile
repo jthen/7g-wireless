@@ -3,13 +3,13 @@ DEVICE  = atmega328p
 F_CPU   = 12000000
 AVRDUDE = avrdude -c stk500v2 -P avrdoper -B1 -p $(DEVICE)
 
-CFLAGS  = -I. -I../common -Iusbdrv -flto
+CFLAGS  = -I. -I../../common -Iusbdrv -flto
 #CFLAGS += -DDBGPRINT
 
 LFLAGS  = -Wl,--relax -flto
 # LFLAGS += -u vfprintf -lprintf_min
 
-VPATH   = ../common
+VPATH   = ../../common
 
 OBJECTS = $(TARGET).o 7G_vusb.o nRF24L.o rf_dngl.o rf_addr.o text_message.o usbdrv/usbdrv.o usbdrv/usbdrvasm.o
 OBJECTS += avrdbg.o
