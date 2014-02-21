@@ -13,8 +13,8 @@ enum msg_type_t
 
 // communication address
 #define NRF_ADDR_SIZE	5
-extern const __flash uint8_t KeyBrdAddr[NRF_ADDR_SIZE];
-extern const __flash uint8_t DongleAddr[NRF_ADDR_SIZE];
+extern const __FLASH uint8_t KeyBrdAddr[NRF_ADDR_SIZE];
+extern const __FLASH uint8_t DongleAddr[NRF_ADDR_SIZE];
 
 // the maximum number of keys that the one packet will carry
 #define MAX_KEYS		6

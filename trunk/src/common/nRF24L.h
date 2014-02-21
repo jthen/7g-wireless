@@ -258,7 +258,7 @@ enum nRFRegister_e
 // receives the data sent by the chip. After each of the command functions
 // this buffer will contain the value of STATUS register in nRF_data[0] and
 // any data the command read from the chip.
-extern __xdata uint8_t nRF_data[MAX_COMMAND_LENGTH];
+__xdata extern uint8_t nRF_data[MAX_COMMAND_LENGTH];
 
 void nRF_Init(void);
 

@@ -9,7 +9,7 @@
 #include <avr/pgmspace.h>
 #include <util/delay.h>
 
-#include "7G_vusb.h"
+#include "vusb.h"
 #include "avrdbg.h"
 #include "utils.h"
 #include "hw_setup.h"

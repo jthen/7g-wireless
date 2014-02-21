@@ -9,7 +9,7 @@
 #include <util/delay.h>
 
 #include "usbdrv.h"
-#include "7G_vusb.h"
+#include "vusb.h"
 #include "rf_dngl.h"
 #include "rf_protocol.h"
 #include "hw_setup.h"

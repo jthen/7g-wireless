@@ -2,26 +2,49 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include <avr/io.h>
-#include <avr/pgmspace.h>
-#include <util/delay.h>
+#ifdef AVR
+# include <avr/io.h>
+# include <avr/pgmspace.h>
+# include <util/delay.h>
+# define __FLASH __flash
+# define __xdata
+# define LED_on()		SetBit(PORT(LED1_PORT), LED1_BIT)
+# define LED_off()		ClrBit(PORT(LED1_PORT), LED1_BIT)
+#else
+# define __FLASH __code
 
-#include "nRF24L.h"
+#define LED_on()		P02 = 1
+#define LED_off()		P02 = 0
+
+void* memcpy_P(void* dest, const __code void* src, size_t count)
+{
+	char* dst8 = (char*)dest;
+	char* src8 = (char*)src;
+
+	while (count--)
+		*dst8++ = *src8++;
+
+	return dest;
+}
+
+#endif
+
 #include "rf_protocol.h"
+#include "nRF24L.h"
 
 #define NRF_CHECK_MODULE
 
 void rf_dngl_init(void)
 {
-	nRF_Init();
-
 	// set the addresses
-	uint8_t buff[5];
+	__xdata uint8_t buff[5];
+
+	nRF_Init();
 
 	memcpy_P(buff, &DongleAddr, NRF_ADDR_SIZE);
 	nRF_WriteAddrReg(RX_ADDR_P0, buff, NRF_ADDR_SIZE);
 
-#ifdef NRF_CHECK_MODULE
+#if defined(NRF_CHECK_MODULE) && defined(AVR)
 
 	nRF_data[1] = 0;
 	nRF_data[2] = 0;
@@ -79,7 +102,7 @@ uint8_t rf_dngl_recv(void* buff, uint8_t buff_size)
 	nRF_ReadReg(FIFO_STATUS);
 	if ((nRF_data[1] & vRX_EMPTY) == 0)
 	{
-		SetBit(PORT(LED1_PORT), LED1_BIT);
+		LED_on();
 		
 		// read the payload
 		nRF_ReadRxPayloadWidth();
@@ -110,7 +133,7 @@ uint8_t rf_dngl_recv(void* buff, uint8_t buff_size)
 		puts("");	// debug
 		*/
 
-		ClrBit(PORT(LED1_PORT), LED1_BIT);
+		LED_off();
 	}
 	
 	return ret_val;
