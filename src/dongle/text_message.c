@@ -1,16 +1,22 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <avr/pgmspace.h>
+#ifdef AVR
+# include <avr/pgmspace.h>
+# define __FLASH __flash
+# define __xdata
+#else
+# define __FLASH __code
+#endif
 
 #include "keycode.h"
 #include "text_message.h"
 
 #define TEXT_MSG_BUFF_SIZE	128
 
-char text_msg_buff[TEXT_MSG_BUFF_SIZE];
-uint8_t text_buff_head = 0;
-uint8_t text_buff_tail = 0;
+__xdata char text_msg_buff[TEXT_MSG_BUFF_SIZE];
+__xdata uint8_t text_buff_head = 0;
+__xdata uint8_t text_buff_tail = 0;
 
 uint8_t msg_capacity(void)
 {
@@ -68,10 +74,10 @@ typedef struct
 	uint8_t		modifiers;
 } char2keycode_t;
 
-#define MOD_LCTRL	_BV(0)
-#define MOD_LSHIFT	_BV(1)
+#define MOD_LCTRL	0x01
+#define MOD_LSHIFT	0x02
 
-const __flash char2keycode_t char2keycode[0x80] = {
+__FLASH const char2keycode_t char2keycode[0x80] = {
 	{KC_NO, 0},		// 0x00
 	{KC_A, MOD_LCTRL},		// 0x01 ctrl-a
 	{KC_HOME, MOD_LSHIFT},	// 0x02 shift-home
