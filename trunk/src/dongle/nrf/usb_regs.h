@@ -8,19 +8,15 @@
 # define __AT(addr)
 #endif
 
-/*
-// we don't use these in our project, 
-
-#define USB_EP_DEFAULT_BUF_SIZE		0x10
-
-USB_REGS_EXTERN volatile __xdata __AT (0xC440) uint8_t out5buf[USB_EP_DEFAULT_BUF_SIZE];
-USB_REGS_EXTERN volatile __xdata __AT (0xC480) uint8_t in5buf[USB_EP_DEFAULT_BUF_SIZE];
-USB_REGS_EXTERN volatile __xdata __AT (0xC4C0) uint8_t out4buf[USB_EP_DEFAULT_BUF_SIZE];
-USB_REGS_EXTERN volatile __xdata __AT (0xC500) uint8_t in4buf[USB_EP_DEFAULT_BUF_SIZE];
-USB_REGS_EXTERN volatile __xdata __AT (0xC540) uint8_t out3buf[USB_EP_DEFAULT_BUF_SIZE];
-USB_REGS_EXTERN volatile __xdata __AT (0xC580) uint8_t in3buf[USB_EP_DEFAULT_BUF_SIZE];
-USB_REGS_EXTERN volatile __xdata __AT (0xC5C0) uint8_t out2buf[USB_EP_DEFAULT_BUF_SIZE];
-*/
+// #define USB_EP_DEFAULT_BUF_SIZE		0x10
+//
+// USB_REGS_EXTERN volatile __xdata __AT (0xC440) uint8_t out5buf[USB_EP_DEFAULT_BUF_SIZE];
+// USB_REGS_EXTERN volatile __xdata __AT (0xC480) uint8_t in5buf[USB_EP_DEFAULT_BUF_SIZE];
+// USB_REGS_EXTERN volatile __xdata __AT (0xC4C0) uint8_t out4buf[USB_EP_DEFAULT_BUF_SIZE];
+// USB_REGS_EXTERN volatile __xdata __AT (0xC500) uint8_t in4buf[USB_EP_DEFAULT_BUF_SIZE];
+// USB_REGS_EXTERN volatile __xdata __AT (0xC540) uint8_t out3buf[USB_EP_DEFAULT_BUF_SIZE];
+// USB_REGS_EXTERN volatile __xdata __AT (0xC580) uint8_t in3buf[USB_EP_DEFAULT_BUF_SIZE];
+// USB_REGS_EXTERN volatile __xdata __AT (0xC5C0) uint8_t out2buf[USB_EP_DEFAULT_BUF_SIZE];
 USB_REGS_EXTERN volatile __xdata __AT (0xC600) uint8_t in2buf[USB_EP2_SIZE];
 //USB_REGS_EXTERN volatile __xdata __AT (0xC640) uint8_t out1buf[USB_EP_DEFAULT_BUF_SIZE];
 USB_REGS_EXTERN volatile __xdata __AT (0xC680) uint8_t in1buf[USB_EP1_SIZE];
