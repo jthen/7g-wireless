@@ -14,7 +14,7 @@ __code const usb_dev_desc_t usb_dev_desc =
 	0,				// bDeviceProtocol
 	USB_EP0_SIZE,	// bMaxPacketSize0
 	0x40aa,			// idVendor			- some unknown vendor id
-	0x9002,			// idProduct
+	0x9003,			// idProduct
 	0x0001,			// bcdDevice
 	1,				// iManufacturer
 	2,				// iProduct

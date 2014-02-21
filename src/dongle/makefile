@@ -1,10 +1,10 @@
 TARGET   = 7G_dngl_nrf.ihx
-CFLAGS   = --model-small -I../../common -I.. -DNRF24LU1
+CFLAGS   = --model-small -I../common -DNRF24LU1
 LFLAGS   = --code-loc 0x0000 --code-size 0x4000 --xram-loc 0x8000 --xram-size 0x800
 ASFLAGS  = -plosgff
-RELFILES = main.rel usb_desc.rel nrf_utils.rel text_message.rel rf_dngl.rel usb.rel crtxinit.rel
+RELFILES = main.rel usb_desc.rel nrf_utils.rel nRF24L.rel text_message.rel rf_addr.rel rf_dngl.rel usb.rel crtxinit.rel
 
-VPATH    = ../../common:../
+VPATH    = ../common
 
 $(TARGET): $(RELFILES)
 	sdcc $(CFLAGS) $(LFLAGS) $(RELFILES) -o $(TARGET)

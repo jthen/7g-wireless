@@ -1,9 +1,9 @@
-TARGET  = 7G_dngl
+TARGET  = avr_dngl
 DEVICE  = atmega328p
 F_CPU   = 12000000
 AVRDUDE = avrdude -c stk500v2 -P avrdoper -B1 -p $(DEVICE)
 
-CFLAGS  = -I. -I../../common -I../ -Iusbdrv -flto
+CFLAGS  = -I. -I../../common -Iusbdrv -I../ -flto
 #CFLAGS += -DDBGPRINT
 
 LFLAGS  = -Wl,--relax -flto
@@ -11,7 +11,7 @@ LFLAGS  = -Wl,--relax -flto
 
 VPATH   = ../../common:../
 
-OBJECTS = $(TARGET).o 7G_vusb.o nRF24L.o rf_dngl.o rf_addr.o text_message.o usbdrv/usbdrv.o usbdrv/usbdrvasm.o
+OBJECTS = $(TARGET).o vusb.o nRF24L.o rf_dngl.o rf_addr.o text_message.o usbdrv/usbdrv.o usbdrv/usbdrvasm.o
 OBJECTS += avrdbg.o
 
 COMPILE = avr-gcc -Wall -Os -DF_CPU=$(F_CPU) $(CFLAGS) -mmcu=$(DEVICE)
