@@ -8,16 +8,14 @@
 #include <avr/pgmspace.h>
 #include <util/delay.h>
 
+#include "target_defs.h"
 #include "usbdrv.h"
 #include "vusb.h"
 #include "rf_dngl.h"
 #include "rf_protocol.h"
 #include "hw_setup.h"
+#include "reports.h"
 #include "utils.h"
-
-// declare the keyboard and sound control reports
-vusb_keyboard_report_t vusb_keyboard_report;
-uint8_t vusb_consumer_report;		// sound control report
 
 uint8_t vusb_idle_rate;				// in 4 ms units - set by SET_IDLE
 uint8_t vusb_idle_counter;
@@ -198,7 +196,7 @@ consumer_interface_name[] =
 void vusb_init(void)
 {
 	// inits the timer used for idle rate
-    // a rate of 12M/(1024 * 256) = 45.78 Hz (21845us)
+    // a rate of 12M/(1024 * 256) = 45.78 Hz (period = 21845us)
 	TCCR0B = _BV(CS02) | _BV(CS00);
 #define TMR1US	21845L
 
@@ -219,8 +217,8 @@ void vusb_init(void)
 	vusb_curr_protocol = 1;	// report protocol
 	
 	// clear the reports
-	vusb_consumer_report = 0;
-	memset(&vusb_keyboard_report, 0, sizeof vusb_keyboard_report);
+	usb_consumer_report = 0;
+	reset_keyboard_report();
 }
 
 bool vusb_poll(void)
@@ -269,10 +267,10 @@ uchar usbFunctionSetup(uchar data[8])
 			// which interface is this for?
 			if (rq->wIndex.word == 1)				// keyboard interface
 			{
-				usbMsgPtr = (usbMsgPtr_t) &vusb_keyboard_report;
-				return sizeof vusb_keyboard_report;
+				usbMsgPtr = (usbMsgPtr_t) &usb_keyboard_report;
+				return sizeof usb_keyboard_report;
 			} else if (rq->wIndex.word == 2)	{	// consumer interface
-				usbMsgPtr = (usbMsgPtr_t) &vusb_consumer_report;
+				usbMsgPtr = (usbMsgPtr_t) &usb_consumer_report;
 				return 1;
 			}
 
@@ -326,7 +324,7 @@ uchar usbFunctionWrite(uchar *data, uchar len)
 						| ((data[0] & 2) ? 4 : 0)
 						| ((data[0] & 4) ? 2 : 0);
 
-	// queue the status which will be sent with the next ACP payload
+	// queue the status which will be sent with the next ACK payload
 	rf_dngl_queue_ack_payload(&msg, sizeof msg);
 
 	vusb_expect_data = 0;

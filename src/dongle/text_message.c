@@ -1,16 +1,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#ifdef AVR
-# include <avr/pgmspace.h>
-# define __FLASH __flash
-# define __xdata
-#else
-# define __FLASH __code
-#endif
-
 #include "keycode.h"
 #include "text_message.h"
+#include "target_defs.h"
 
 #define TEXT_MSG_BUFF_SIZE	128
 

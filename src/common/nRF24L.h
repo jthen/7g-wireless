@@ -287,7 +287,7 @@ uint8_t nRF_FlushRX(void);
 uint8_t nRF_ReadRxPayloadWidth(void);
 
 // writes the ACK payload (num_bytes <= 32, pipe_num <= 5)
-uint8_t nRF_WriteAckPayload(const uint8_t* payload, const uint8_t num_bytes, const uint8_t pipe_num);
+uint8_t nRF_WriteAckPayload(__xdata const uint8_t* payload, const uint8_t num_bytes, const uint8_t pipe_num);
 
 // the NOP command
 uint8_t nRF_NOP(void);

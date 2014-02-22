@@ -2,33 +2,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#ifdef AVR
-# include <avr/io.h>
-# include <avr/pgmspace.h>
-# include <util/delay.h>
-# define __FLASH __flash
-# define __xdata
-# define LED_on()		SetBit(PORT(LED1_PORT), LED1_BIT)
-# define LED_off()		ClrBit(PORT(LED1_PORT), LED1_BIT)
-#else
-# define __FLASH __code
-
-#define LED_on()		P02 = 1
-#define LED_off()		P02 = 0
-
-void* memcpy_P(void* dest, const __code void* src, size_t count)
-{
-	char* dst8 = (char*)dest;
-	char* src8 = (char*)src;
-
-	while (count--)
-		*dst8++ = *src8++;
-
-	return dest;
-}
-
-#endif
-
+#include "target_defs.h"
 #include "rf_protocol.h"
 #include "nRF24L.h"
 
@@ -94,7 +68,7 @@ void rf_dngl_init(void)
 	nRF_CE_hi();		// start receiving
 }
 
-uint8_t rf_dngl_recv(void* buff, uint8_t buff_size)
+uint8_t rf_dngl_recv(__xdata void* buff, uint8_t buff_size)
 {
 	uint8_t ret_val = 0;
 	
@@ -115,7 +89,7 @@ uint8_t rf_dngl_recv(void* buff, uint8_t buff_size)
 			ret_val = 0;
 		} else {
 			nRF_ReadRxPayload(ret_val);
-			memcpy(buff, nRF_data+1, ret_val > buff_size ? buff_size : ret_val);
+			memcpy_X(buff, nRF_data + 1, ret_val > buff_size ? buff_size : ret_val);
 		}
 
 		// reset the TX_DS
@@ -139,7 +113,7 @@ uint8_t rf_dngl_recv(void* buff, uint8_t buff_size)
 	return ret_val;
 }
 
-void rf_dngl_queue_ack_payload(void* buff, const uint8_t num_bytes)
+void rf_dngl_queue_ack_payload(__xdata void* buff, const uint8_t num_bytes)
 {
 	// get the TX FIFO status
 	nRF_ReadReg(FIFO_STATUS);
