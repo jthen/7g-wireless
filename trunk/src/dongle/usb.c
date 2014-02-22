@@ -3,9 +3,11 @@
 
 #include "reg24lu1.h"
 #include "nrf_utils.h"
+#include "reports.h"
+#include "rf_protocol.h"
+#include "rf_dngl.h"
 
-#include "usb_defs.h"
-#include "usb_desc.h"
+#include "usb.h"
 
 #define DEFINE_USB_REGS
 #include "usb_regs.h"
@@ -22,9 +24,7 @@ uint8_t packetizer_data_size;
 // usbframel & usbframeh are not good enough for this because of
 // difficulty accesing both LSB and MSB in a predictable manner
 uint16_t usbFrameCnt = 0;
-uint8_t usbHidIdle = 0;			// forever
-uint8_t usbLEDReport = 0;
-hid_report_t kbdReport;
+__xdata uint8_t usbHidIdle = 0;		// forever
 
 void usbInit(void)
 {
@@ -32,7 +32,7 @@ void usbInit(void)
 	usbcs |= 0x08;
 	delay_ms(50);
 	usbcs &= ~0x08;
-
+	
 	// set up interrupts and clear interrupt flags
 	usbien = 0b00011011;	// bit	description
 							// 5-7	unused
@@ -287,14 +287,14 @@ void usbHidRequest(void)
 		// this requests the HID report we defined with the HID report descriptor.
 		// this is usually sent over EP1 IN, but can be sent over EP0 too.
 
-		in0buf[0] = kbdReport.modifiers;
+		in0buf[0] = usb_keyboard_report.modifiers;
 		in0buf[1] = 0;
-		in0buf[2] = kbdReport.keys[0];
-		in0buf[3] = kbdReport.keys[1];
-		in0buf[4] = kbdReport.keys[2];
-		in0buf[5] = kbdReport.keys[3];
-		in0buf[6] = kbdReport.keys[4];
-		in0buf[7] = kbdReport.keys[5];
+		in0buf[2] = usb_keyboard_report.keys[0];
+		in0buf[3] = usb_keyboard_report.keys[1];
+		in0buf[4] = usb_keyboard_report.keys[2];
+		in0buf[5] = usb_keyboard_report.keys[3];
+		in0buf[6] = usb_keyboard_report.keys[4];
+		in0buf[7] = usb_keyboard_report.keys[5];
 
 		// send the data on it's way
 		in0bc = 8;
@@ -344,10 +344,7 @@ void usbRequestReceived(void)
 			USB_EP0_STALL();
 			
 	} else if (requestType == 0x20) {	// class request
-
 		usbHidRequest();
-		
-	//} else if (requestType == 0x40) {	// vendor request
 	} else {
 		// stall on unsupported requests
 		USB_EP0_STALL();
@@ -357,7 +354,21 @@ void usbRequestReceived(void)
 void usbRequestDataReceived(void)
 {
 	if (usbRequest.bRequest == USB_REQ_HID_SET_REPORT)
-		usbLEDReport = out0buf[0];
+	{
+		__xdata rf_msg_led_status_t msg;
+		
+		usb_led_report = out0buf[0];
+		
+		// swap the CAPS and SCROLL bits because the controller
+		// has these the other way around than the report
+		msg.msg_type = MT_LED_STATUS;
+		msg.led_status = (usb_led_report & 1)
+						| ((usb_led_report & 2) ? 4 : 0)
+						| ((usb_led_report & 4) ? 2 : 0);
+						
+		// queue the status which will be sent with the next ACK payload
+		rf_dngl_queue_ack_payload(&msg, sizeof msg);
+	}
 		
 	// send an empty packet and ACK the request
 	in0bc = 0x00;
@@ -412,15 +423,14 @@ void usbPoll(void)
 		
 		usbRequestDataReceived();
 		
-		// rearm the next EP0 OUT
-		out0bc = 0x40;
+		out0bc = 0x40;	// rearm the next EP0 OUT
 		break;
 
 	case INT_EP1IN:
-		in_irq = 0x02;	// clear interrupt flag
+		in_irq = 0x02;
 		break;
 	case INT_EP2IN:
-		in_irq = 0x04;	// clear interrupt flag
+		in_irq = 0x04;
 		break;
 	}
 }

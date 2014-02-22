@@ -1,8 +1,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "usb_desc.h"
-#include "usb_defs.h"
+#include "usb.h"
 
 __code const usb_dev_desc_t usb_dev_desc =
 {
@@ -160,11 +159,12 @@ __code const usb_conf_desc_keyboard_t usb_conf_desc =
 	{
 		sizeof(usb_ep_desc_t),
 		USB_DESC_ENDPOINT,
-		0x81,				// bEndpointAddress
+		0x82,				// bEndpointAddress
 		USB_EP_TYPE_INT,	// bmAttributes
-		USB_EP1_SIZE,		// wMaxPacketSize
+		USB_EP2_SIZE,		// wMaxPacketSize
 		1,					// bInterval		10ms
-	},};
+	}
+};
 
 // string table 
 __code const uint8_t usb_string_desc_0[] = {0x04, 0x03, 0x09, 0x04};
