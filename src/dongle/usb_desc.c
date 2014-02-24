@@ -7,7 +7,7 @@ __code const usb_dev_desc_t usb_dev_desc =
 {
 	sizeof(usb_dev_desc_t),
 	USB_DESC_DEVICE, 
-	0x0200,			// bcdUSB
+	0x0110,			// bcdUSB
 	0,				// bDeviceClass		- deferred to interface
 	0,				// bDeviceSubclass
 	0,				// bDeviceProtocol

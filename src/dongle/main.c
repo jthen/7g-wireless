@@ -51,6 +51,13 @@ void main()
 	P0DIR = 0x00;	// all outputs
 	P0ALT = 0x00;	// all GPIO default behavior
 	
+	P00 = 0;		// all outputs low
+	P01 = 0;
+	P02 = 0;
+	P03 = 0;
+	P04 = 0;
+	P05 = 0;
+	
 	LED_off();
 
 	usbInit();

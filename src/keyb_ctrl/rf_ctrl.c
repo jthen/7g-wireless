@@ -88,36 +88,58 @@ bool rf_ctrl_send_message(const void* buff, const uint8_t num_bytes)
 	nRF_WriteReg(RF_SETUP, vRF_DR_2MBPS			// data rate 
 							| get_nrf_output_power());	// output power
 
+	nRF_FlushTX();
 	nRF_WriteReg(CONFIG, vEN_CRC | vCRCO | vPWR_UP);	// power up
 	nRF_WriteReg(STATUS, vTX_DS | vRX_DR | vMAX_RT);	// reset the status flag
 	nRF_WriteTxPayload(buff, num_bytes);
-
-	nRF_CE_hi();	// signal the transceiver to send the packet
-
-	// wait for the nRF to signal an event
-	sleep_ticks(3);
-	while (PIN(NRF_IRQ_PORT) & _BV(NRF_IRQ_BIT))
-		sleep_ticks(1);
-
-	nRF_CE_lo();
-
-	uint8_t status = nRF_NOP();				// read the status reg
-	bool ret_val = (status & vTX_DS);		// did we get an ACK?
-
-	nRF_FlushTX();
-	nRF_WriteReg(STATUS, vMAX_RT | vTX_DS | vRX_DR);	// reset the status flags
-	nRF_WriteReg(CONFIG, vEN_CRC | vCRCO);				// go to nRF power down
 	
-	if (!ret_val)
-		++plos_total;
+	bool is_sent;
+	uint8_t ticks = 15;
+	uint8_t attempts = 0;
+	const uint8_t MAX_TICKS = 245;
+	
+	do {
+		nRF_CE_hi();	// signal the transceiver to send the packet
 
-	// read the ARC
-	nRF_ReadReg(OBSERVE_TX);
-	arc_total += nRF_data[1] & 0x0f;
+		// wait for the nRF to signal an event
+		sleep_ticks(3);
+		while (PIN(NRF_IRQ_PORT) & _BV(NRF_IRQ_BIT))
+			sleep_ticks(1);
+
+		nRF_CE_lo();
+
+		uint8_t status = nRF_NOP();			// read the status reg
+		is_sent = (status & vTX_DS);		// did we get an ACK?
+
+		nRF_WriteReg(STATUS, vMAX_RT | vTX_DS | vRX_DR);	// reset the status flags
+		
+		if (!is_sent)
+		{
+			++plos_total;
+			nRF_ReuseTxPayload();		// send the last message again
+		}
+
+		// read the ARC
+		nRF_ReadReg(OBSERVE_TX);
+		arc_total += nRF_data[1] & 0x0f;
+		
+		++rf_packets_total;
+		
+		if (ticks >= MAX_TICKS)
+		{
+			sleep_max(5);
+		} else {
+			sleep_ticks(ticks);
+			ticks += 5;
+		}
+		
+		++attempts;
+		
+	} while (!is_sent  &&  attempts < 200);
+
+	nRF_WriteReg(CONFIG, vEN_CRC | vCRCO);		// nRF power down
 	
-	++rf_packets_total;
-	
-	return ret_val;
+	return is_sent;
 }
 
 uint8_t rf_ctrl_read_ack_payload(void* buff, const uint8_t buff_size)
