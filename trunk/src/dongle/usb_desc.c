@@ -162,7 +162,7 @@ __code const usb_conf_desc_keyboard_t usb_conf_desc =
 		0x82,				// bEndpointAddress
 		USB_EP_TYPE_INT,	// bmAttributes
 		USB_EP2_SIZE,		// wMaxPacketSize
-		1,					// bInterval		10ms
+		10,					// bInterval		10ms
 	}
 };
 
@@ -178,11 +178,11 @@ __code const uint16_t usb_string_desc_1[] =
 __code const uint16_t usb_string_desc_2[] =
 {
 	0x0300 | sizeof(usb_string_desc_2),		// string descriptor ID and length
-	'n','R','F','2','4','L','U','1','+',' ','K','e','y','b','o','a','r','d',' ','D','e','m','o'
+	'7','G',' ','W','i','r','e','l','e','s','s',' ','K','e','y','b','o','a','r','d'
 };
 
 __code const uint16_t usb_string_desc_3[] =
 {
 	0x0300 | sizeof(usb_string_desc_3),		// string descriptor ID and length
-	'0','.','1','2','2','3','4','2'
+	'2','0','1','4','-','0','2','-','2','2'
 };
