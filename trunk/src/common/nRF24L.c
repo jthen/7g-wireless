@@ -158,6 +158,11 @@ uint8_t nRF_WriteTxPayload(const uint8_t* payload, const uint8_t num_bytes)
 	return nRF_ShiftCommand(num_bytes + 1);
 }
 
+uint8_t nRF_ReuseTxPayload(void)
+{
+	return nRF_ShiftByte(REUSE_TX_PL);
+}
+
 uint8_t nRF_FlushTX(void)
 {
 	return nRF_ShiftByte(FLUSH_TX);

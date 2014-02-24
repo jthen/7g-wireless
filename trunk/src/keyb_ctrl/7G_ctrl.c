@@ -22,10 +22,12 @@
 #include "sleeping.h"
 #include "ctrl_settings.h"
 
-void process_normal(void)
+// returns false if we should enter the menu, true if we should lock the keyboard
+bool process_normal(void)
 {
 	bool waiting_for_all_keys_up = false;
 	bool are_all_keys_up;
+	bool ret_val = false;
 
 	do {
 		wait_for_matrix_change();
@@ -53,8 +55,16 @@ void process_normal(void)
 			if (is_pressed_keycode(KC_F6))		report.consumer |= _BV(FN_NEXT_TRACK_BIT);
 
 			// if only Func and Esc are pressed
-			if (is_pressed_keycode(KC_ESC)  &&  get_num_keys_pressed() == 2)
-				waiting_for_all_keys_up = true;
+			if (get_num_keys_pressed() == 2)
+			{
+				if (is_pressed_keycode(KC_ESC))
+				{
+					waiting_for_all_keys_up = true;
+				} else if (is_pressed_keycode(KC_L)) {
+					waiting_for_all_keys_up = true;
+					ret_val = true;
+				}
+			}
 
 		} else {
 
@@ -79,23 +89,18 @@ void process_normal(void)
 		}
 
 		// send the report and wait for ACK
-		bool is_sent;
-		const uint8_t MAX_SEND_RETRY = 10;
-		uint8_t drop_cnt = 0;
-		do {
-			is_sent = rf_ctrl_send_message(&report, num_keys + 3);
-			if (!is_sent)
-				++drop_cnt;
-			
-			// flush the ACK payloads
-			rf_ctrl_process_ack_payloads(NULL, NULL);
+		if (!rf_ctrl_send_message(&report, num_keys + 3))
+			return true;
 
-		} while (!is_sent  &&  drop_cnt < MAX_SEND_RETRY);
+		// flush the ACK payloads
+		rf_ctrl_process_ack_payloads(NULL, NULL);
 		
 	} while (!waiting_for_all_keys_up  ||  are_all_keys_up);
+	
+	return ret_val;
 }
 
-void send_text(const char* msg, bool is_flash, bool wait_for_finish)
+bool send_text(const char* msg, bool is_flash, bool wait_for_finish)
 {
 #ifdef DBGPRINT
 	// This needs an explanation: I am using the AVR Dragon to flash the keyboard firmware
@@ -140,18 +145,20 @@ void send_text(const char* msg, bool is_flash, bool wait_for_finish)
 		// it is large enough to store the next chunk
 
 		do {
-			sleep_max(1);	// doze off a little
+			sleep_ticks(2);		// doze off a little
 			
 			// send an empty text message; this causes the dongle to respond with ACK payload
 			// that contains the number of bytes available in the dongle's text buffer
-			rf_ctrl_send_message(&txt_msg, 1);	// 1 byte for the message type ID
+			if (!rf_ctrl_send_message(&txt_msg, 1))		// 1 byte for the message type ID
+				return false;
 			
-			// read the number of bytes 
 			rf_ctrl_process_ack_payloads(&msg_bytes_free, NULL);
+
 		} while (msg_bytes_free < chunklen + 1);
 		
 		// send the message
-		rf_ctrl_send_message(&txt_msg, chunklen + 1);
+		if (!rf_ctrl_send_message(&txt_msg, chunklen + 1))
+			return false;
 	}
 
 	// flush the ACK payload(s)
@@ -164,10 +171,14 @@ void send_text(const char* msg, bool is_flash, bool wait_for_finish)
 	{
 		uint8_t msg_bytes_capacity = 0;
 		do {
-			rf_ctrl_send_message(&txt_msg, 1);
+			if (!rf_ctrl_send_message(&txt_msg, 1))
+				return false;
+
 			rf_ctrl_process_ack_payloads(&msg_bytes_free, &msg_bytes_capacity);
 		} while (msg_bytes_free == 0  ||  msg_bytes_free != msg_bytes_capacity);
 	}
+	
+	return true;
 }
 
 // defining this makes the ADC use the two least significant bits, but adds 24 bytes to the binary
@@ -256,7 +267,9 @@ bool process_menu(void)
 	
 	// print the main menu
 	uint8_t keycode;
-	char string_buff[16];
+	char* pEnd;
+	const uint8_t BUFF_SIZE = 64;
+	char string_buff[BUFF_SIZE];
 	for (;;)
 	{
 		// welcome & version
@@ -264,21 +277,22 @@ bool process_menu(void)
 						"7G wireless\n"
 						"firmware build " __DATE__ "  " __TIME__ "\n"
 						"battery voltage: "), true, false);
-
+			
 		get_battery_voltage_str(string_buff);
 		send_text(string_buff, false, false);
 
 		// RF stats
 		send_text(PSTR("\nRF packet stats (total/retransmit/lost): "), true, false);
+		
 		ultoa(rf_packets_total, string_buff, 10);
-		send_text(string_buff, false, false);
+		pEnd = strchr(string_buff, '\0');
+		*pEnd++ = '/';
+		
+		ultoa(arc_total, pEnd, 10);
+		pEnd = strchr(string_buff, '\0');
+		*pEnd++ = '/';
 
-		send_text(PSTR("/"), true, false);
-		ultoa(arc_total, string_buff, 10);
-		send_text(string_buff, false, false);
-
-		send_text(PSTR("/"), true, false);
-		ultoa(plos_total, string_buff, 10);
+		ultoa(plos_total, pEnd, 10);
 		send_text(string_buff, false, false);
 		
 		// output the time since reset
@@ -287,27 +301,28 @@ bool process_menu(void)
 		get_time(&days, &hours, &minutes, &seconds);
 		send_text(PSTR("\nkeyboard's been on for "), true, false);
 		
-		if (days)
+		string_buff[0] = '\0';
+		if (days > 0)
 		{
 			itoa(days, string_buff, 10);
-			send_text(string_buff, false, false);
-			send_text(PSTR(" days "), true, false);
+			strcat_P(string_buff, PSTR(" days "));
 		}
 
-		if (hours)
+		if (hours > 0  ||  days > 0)
 		{
-			itoa(hours, string_buff, 10);
-			send_text(string_buff, false, false);
-			send_text(PSTR(" hours "), true, false);
+			itoa(hours, strchr(string_buff, 0), 10);
+			pEnd = strlcat_P(string_buff, PSTR(" hours "), BUFF_SIZE) + string_buff;
+		} else {
+			pEnd = strchr(string_buff, 0);
 		}
 
-		itoa(minutes, string_buff, 10);
-		send_text(string_buff, false, false);
-		send_text(PSTR(" minutes "), true, false);
+		itoa(minutes, pEnd, 10);
+		pEnd = strlcat_P(string_buff, PSTR(" minutes "), BUFF_SIZE) + string_buff;
 
-		itoa(seconds, string_buff, 10);
+		itoa(seconds, pEnd, 10);
+		strcat_P(string_buff, PSTR(" seconds\n"));
+		
 		send_text(string_buff, false, false);
-		send_text(PSTR(" seconds\n"), true, false);
 		
 		// menu
 		send_text(PSTR("\n\nwhat do you want to do?\n"
@@ -471,8 +486,7 @@ int main(void)
 	
 	for (;;)
 	{
-		process_normal();
-		if (process_menu())
+		if (process_normal()  ||  process_menu())
 			process_lock();
 	}
 

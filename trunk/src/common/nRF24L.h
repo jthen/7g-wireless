@@ -279,6 +279,9 @@ uint8_t nRF_ReadRxPayload(const uint8_t num_bytes);
 // writes the TX payload (max num_bytes == 32)
 uint8_t nRF_WriteTxPayload(const uint8_t* payload, const uint8_t num_bytes);
 
+// tries to send the last payload again (needs CE pulse)
+uint8_t nRF_ReuseTxPayload(void);
+
 // the flush commands
 uint8_t nRF_FlushTX(void);
 uint8_t nRF_FlushRX(void);
