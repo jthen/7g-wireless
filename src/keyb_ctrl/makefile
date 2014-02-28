@@ -11,7 +11,7 @@ FUSEL   = 0x62
 FUSEX   = 0xff
 
 CFLAGS	= -I. -I../common -Wall -Os -flto
-#CFLAGS += -DDBGPRINT
+CFLAGS += -DDBGPRINT
 
 LFLAGS  = -Wl,--relax -flto
 #LFLAGS += -u vfprintf -lprintf_min
@@ -21,7 +21,7 @@ VPATH   = ../common
 
 COMPILE = avr-gcc -mmcu=$(DEVICE) -DF_CPU=$(F_CPU) $(CFLAGS)
 
-OBJECTS = $(TARGET).o nRF24L.o matrix.o led.o rf_ctrl.o rf_addr.o sleeping.o ctrl_settings.o
+OBJECTS = $(TARGET).o nRF24L.o matrix.o led.o rf_ctrl.o rf_addr.o sleeping.o ctrl_settings.o calib_32khz.o
 # avrdbg.c contains debugging helper functions which should
 # not be included in the final version
 OBJECTS += avrdbg.o

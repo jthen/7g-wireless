@@ -94,9 +94,12 @@ bool rf_ctrl_send_message(const void* buff, const uint8_t num_bytes)
 	nRF_WriteTxPayload(buff, num_bytes);
 	
 	bool is_sent;
-	uint8_t ticks = 15;
+
 	uint8_t attempts = 0;
-	const uint8_t MAX_TICKS = 245;
+	const uint8_t MAX_ATTEMPTS = 45;
+
+	uint8_t ticks = 15;
+	const uint8_t TICKS_INCREMENT = 20;
 	
 	do {
 		nRF_CE_hi();	// signal the transceiver to send the packet
@@ -109,33 +112,33 @@ bool rf_ctrl_send_message(const void* buff, const uint8_t num_bytes)
 		nRF_CE_lo();
 
 		uint8_t status = nRF_NOP();			// read the status reg
-		is_sent = (status & vTX_DS);		// did we get an ACK?
+		is_sent = (status & vTX_DS) != 0;	// did we get an ACK?
 
 		nRF_WriteReg(STATUS, vMAX_RT | vTX_DS | vRX_DR);	// reset the status flags
 		
-		if (!is_sent)
-		{
-			++plos_total;
-			nRF_ReuseTxPayload();		// send the last message again
-		}
-
 		// read the ARC
 		nRF_ReadReg(OBSERVE_TX);
 		arc_total += nRF_data[1] & 0x0f;
 		
 		++rf_packets_total;
 		
-		if (ticks >= MAX_TICKS)
+		if (!is_sent)
 		{
-			sleep_max(5);
-		} else {
-			sleep_ticks(ticks);
-			ticks += 5;
+			++plos_total;
+			nRF_ReuseTxPayload();		// send the last message again
+			
+			if (ticks >= 0xfe - TICKS_INCREMENT)
+			{
+				sleep_max(5);		// 63ms*5 == 0.315sec
+			} else {
+				sleep_ticks(ticks);
+				ticks += TICKS_INCREMENT;
+			}
 		}
-		
+
 		++attempts;
-		
-	} while (!is_sent  &&  attempts < 200);
+
+	} while (!is_sent  &&  attempts < MAX_ATTEMPTS);
 
 	nRF_WriteReg(CONFIG, vEN_CRC | vCRCO);		// nRF power down
 	

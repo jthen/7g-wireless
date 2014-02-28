@@ -5,7 +5,7 @@
 #include "text_message.h"
 #include "target_defs.h"
 
-#define TEXT_MSG_BUFF_SIZE	128
+#define TEXT_MSG_BUFF_SIZE	45
 
 __xdata char text_msg_buff[TEXT_MSG_BUFF_SIZE];
 __xdata uint8_t text_buff_head = 0;
