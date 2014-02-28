@@ -14,6 +14,8 @@
 #include "usb.h"
 #include "usb_regs.h"
 
+#include "nrf_uart.h"
+
 __xdata void* memcpy_X(__xdata void* dest, __xdata const void* src, size_t count)
 {
 	__xdata char* dst8 = (__xdata char*)dest;
@@ -51,16 +53,10 @@ void main()
 	P0DIR = 0x00;	// all outputs
 	P0ALT = 0x00;	// all GPIO default behavior
 	
-	P00 = 0;		// all outputs low
-	P01 = 0;
-	P02 = 0;
-	P03 = 0;
-	P04 = 0;
-	P05 = 0;
-	
 	LED_off();
 
 	usbInit();
+	uartInit();
 
 	rf_dngl_init();
 
@@ -69,6 +65,7 @@ void main()
 	for (;;)
 	{
 		usbPoll();	// handles USB interrupts
+		uartPoll();	// send chard from the uart TX buffer
 		
 		// try to read the recv buffer
 		bytes_received = rf_dngl_recv(recv_buffer, RECV_BUFF_SIZE);

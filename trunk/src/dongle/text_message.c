@@ -5,7 +5,7 @@
 #include "text_message.h"
 #include "target_defs.h"
 
-#define TEXT_MSG_BUFF_SIZE	45
+#define TEXT_MSG_BUFF_SIZE	128
 
 __xdata char text_msg_buff[TEXT_MSG_BUFF_SIZE];
 __xdata uint8_t text_buff_head = 0;
@@ -131,7 +131,7 @@ __FLASH const char2keycode_t char2keycode[0x80] = {
 	{KC_9, 0},		// 9
 	{KC_SCOLON, MOD_LSHIFT},	// :
 	{KC_SCOLON, 0},				// ;
-	{KC_COMMA, 0},				// <
+	{KC_COMMA, MOD_LSHIFT},		// <
 	{KC_EQUAL, 0},				// =
 	{KC_DOT, MOD_LSHIFT},		// >
 	{KC_SLASH, MOD_LSHIFT},		// ?
