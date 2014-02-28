@@ -102,7 +102,6 @@ bool process_normal(void)
 
 bool send_text(const char* msg, bool is_flash, bool wait_for_finish)
 {
-/*
 #ifdef DBGPRINT
 	// This needs an explanation: I am using the AVR Dragon to flash the keyboard firmware
 	// and it looks like the dragon has a strong pullup on the MISO line. This pullup is
@@ -117,9 +116,8 @@ bool send_text(const char* msg, bool is_flash, bool wait_for_finish)
 	else
 		dprint(msg);
 	_delay_ms(1);
-	return;
+	return true;
 #endif
-*/
 
 	// this message id is used to avoid presenting the same package to the dongle in case dongle
 	// received the message, but the keyboard did not receive the ACK
@@ -128,15 +126,14 @@ bool send_text(const char* msg, bool is_flash, bool wait_for_finish)
 	rf_msg_text_t txt_msg;
 	txt_msg.msg_type = MT_TEXT;
 
-	// flush the ACK payload
-	uint8_t msg_bytes_free;
-	rf_ctrl_process_ack_payloads(NULL, NULL);
-
 	// send the message in chunks of MAX_TEXT_LEN
 	uint16_t msglen = is_flash ? strlen_P(msg) : strlen(msg);
-	uint8_t chunklen;
+	uint8_t chunklen, msg_bytes_free;
 	while (msglen)
 	{
+		// flush the ACK payload
+		rf_ctrl_process_ack_payloads(&msg_bytes_free, NULL);
+	
 		// copy a chunk of the message
 		chunklen = msglen > MAX_TEXT_LEN ? MAX_TEXT_LEN : msglen;
 		if (is_flash)
@@ -150,22 +147,21 @@ bool send_text(const char* msg, bool is_flash, bool wait_for_finish)
 		// query the free space of the buffer on the dongle to see if
 		// it is large enough to store the next chunk
 
-		uint8_t c = 0;
-		
-		do {
-			sleep_ticks(2);		// doze off a little
-			
+		for (;;)
+		{
 			// send an empty text message; this causes the dongle to respond with ACK payload
 			// that contains the number of bytes available in the dongle's text buffer
-			rf_ctrl_send_message(&txt_msg, 2);		// 1 byte for the message type ID, 1 for the msg_id
+			if (!rf_ctrl_send_message(&txt_msg, 2))		// 1 byte for the message type ID, 1 for the msg_id
+				return false;
 			
 			rf_ctrl_process_ack_payloads(&msg_bytes_free, NULL);
-
-			++c;
 			
-		} while (msg_bytes_free < chunklen + 1);
-		
-		dprint_P(PSTR("fr=%i ch=%i\n"), msg_bytes_free, chunklen);
+			// enough space in the dongle buffer?
+			if (msg_bytes_free > chunklen + 1)
+				break;
+				
+			sleep_ticks(40);		// doze off a little; roughly 10ms
+		}
 		
 		// set the message id and send it on it's way
 		msg_id = msg_id == 0xff ? 1 : msg_id + 1;
@@ -285,8 +281,6 @@ bool process_menu(void)
 	char string_buff[BUFF_SIZE];
 	for (;;)
 	{
-		dprint_P(PSTR("---------------\n"));
-		
 		// welcome & version
 		if (!send_text(PSTR("\x01"	// translates to Ctrl-A on the dongle
 							"7G wireless\n"
@@ -478,7 +472,7 @@ void init_hw(void)
 	// PE0 and PE1 are used for timing and debugging
 	// Note: these are the UART RX (PE0) and TX (PE1) pins
 	
-	DDRE = _BV(0) | _BV(1);
+	//DDRE = _BV(0) | _BV(1);
 
 	matrix_init();
 	rf_ctrl_init();

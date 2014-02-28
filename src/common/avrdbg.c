@@ -9,7 +9,7 @@
 #include "avrdbg.h"
 #include "hw_setup.h"
 
-#define BAUD 57600
+#define BAUD 115200
 #include <util/setbaud.h>
 
 static int serial_putchar(char c, FILE *stream);
