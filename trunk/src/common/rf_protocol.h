@@ -38,11 +38,13 @@ typedef struct
 	uint8_t		keys[MAX_KEYS];
 } rf_msg_key_state_report_t;
 
-#define MAX_TEXT_LEN	31
+#define MAX_TEXT_LEN	30
 
 typedef struct
 {
 	uint8_t		msg_type;		// == MT_TEXT
+	uint8_t		msg_id;			// increments on every text message
+								// used to ignore text messages that have been resent
 	char		text[MAX_TEXT_LEN];
 } rf_msg_text_t;
 

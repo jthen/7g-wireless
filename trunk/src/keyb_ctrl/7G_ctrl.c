@@ -102,6 +102,7 @@ bool process_normal(void)
 
 bool send_text(const char* msg, bool is_flash, bool wait_for_finish)
 {
+/*
 #ifdef DBGPRINT
 	// This needs an explanation: I am using the AVR Dragon to flash the keyboard firmware
 	// and it looks like the dragon has a strong pullup on the MISO line. This pullup is
@@ -110,7 +111,7 @@ bool send_text(const char* msg, bool is_flash, bool wait_for_finish)
 	// function will never return.
 	//
 	// So, instead of plugging the ISP cable in and out all the time while testing firmware updates,
-	// I just output the text to UART and return
+	// we just output the text to UART and return
 	if (is_flash)
 		dprint_P(msg);
 	else
@@ -118,7 +119,12 @@ bool send_text(const char* msg, bool is_flash, bool wait_for_finish)
 	_delay_ms(1);
 	return;
 #endif
+*/
 
+	// this message id is used to avoid presenting the same package to the dongle in case dongle
+	// received the message, but the keyboard did not receive the ACK
+	static uint8_t msg_id = 1;
+	
 	rf_msg_text_t txt_msg;
 	txt_msg.msg_type = MT_TEXT;
 
@@ -144,20 +150,27 @@ bool send_text(const char* msg, bool is_flash, bool wait_for_finish)
 		// query the free space of the buffer on the dongle to see if
 		// it is large enough to store the next chunk
 
+		uint8_t c = 0;
+		
 		do {
 			sleep_ticks(2);		// doze off a little
 			
 			// send an empty text message; this causes the dongle to respond with ACK payload
 			// that contains the number of bytes available in the dongle's text buffer
-			if (!rf_ctrl_send_message(&txt_msg, 1))		// 1 byte for the message type ID
-				return false;
+			rf_ctrl_send_message(&txt_msg, 2);		// 1 byte for the message type ID, 1 for the msg_id
 			
 			rf_ctrl_process_ack_payloads(&msg_bytes_free, NULL);
 
+			++c;
+			
 		} while (msg_bytes_free < chunklen + 1);
 		
-		// send the message
-		if (!rf_ctrl_send_message(&txt_msg, chunklen + 1))
+		dprint_P(PSTR("fr=%i ch=%i\n"), msg_bytes_free, chunklen);
+		
+		// set the message id and send it on it's way
+		msg_id = msg_id == 0xff ? 1 : msg_id + 1;
+		txt_msg.msg_id = msg_id;
+		if (!rf_ctrl_send_message(&txt_msg, chunklen + 2))
 			return false;
 	}
 
@@ -171,7 +184,7 @@ bool send_text(const char* msg, bool is_flash, bool wait_for_finish)
 	{
 		uint8_t msg_bytes_capacity = 0;
 		do {
-			if (!rf_ctrl_send_message(&txt_msg, 1))
+			if (!rf_ctrl_send_message(&txt_msg, 2))
 				return false;
 
 			rf_ctrl_process_ack_payloads(&msg_bytes_free, &msg_bytes_capacity);
@@ -272,17 +285,20 @@ bool process_menu(void)
 	char string_buff[BUFF_SIZE];
 	for (;;)
 	{
+		dprint_P(PSTR("---------------\n"));
+		
 		// welcome & version
-		send_text(PSTR("\x01"	// translates to Ctrl-A on the dongle
-						"7G wireless\n"
-						"firmware build " __DATE__ "  " __TIME__ "\n"
-						"battery voltage: "), true, false);
+		if (!send_text(PSTR("\x01"	// translates to Ctrl-A on the dongle
+							"7G wireless\n"
+							"firmware build " __DATE__ "  " __TIME__ "\n"
+							"battery voltage: "), true, false))
+			return true;
 			
 		get_battery_voltage_str(string_buff);
-		send_text(string_buff, false, false);
+		if (!send_text(string_buff, false, false))		return true;
 
 		// RF stats
-		send_text(PSTR("\nRF packet stats (total/retransmit/lost): "), true, false);
+		if (!send_text(PSTR("\nRF packet stats (total/retransmit/lost): "), true, false))		return true;
 		
 		ultoa(rf_packets_total, string_buff, 10);
 		pEnd = strchr(string_buff, '\0');
@@ -293,13 +309,13 @@ bool process_menu(void)
 		*pEnd++ = '/';
 
 		ultoa(plos_total, pEnd, 10);
-		send_text(string_buff, false, false);
+		if (!send_text(string_buff, false, false))		return true;
 		
 		// output the time since reset
 		uint16_t days;
 		uint8_t hours, minutes, seconds;
 		get_time(&days, &hours, &minutes, &seconds);
-		send_text(PSTR("\nkeyboard's been on for "), true, false);
+		if (!send_text(PSTR("\nkeyboard's been on for "), true, false))		return true;
 		
 		string_buff[0] = '\0';
 		if (days > 0)
@@ -322,11 +338,11 @@ bool process_menu(void)
 		itoa(seconds, pEnd, 10);
 		strcat_P(string_buff, PSTR(" seconds\n"));
 		
-		send_text(string_buff, false, false);
+		if (!send_text(string_buff, false, false))		return true;
 		
 		// menu
-		send_text(PSTR("\n\nwhat do you want to do?\n"
-						"F1 - change transmitter output power (current "), true, false);
+		if (!send_text(PSTR("\n\nwhat do you want to do?\n"
+							"F1 - change transmitter output power (current "), true, false))		return true;
 		switch (get_nrf_output_power())
 		{
 		case vRF_PWR_M18DBM:	send_text(PSTR("-18"), true, false); 	break;
@@ -335,7 +351,7 @@ bool process_menu(void)
 		case vRF_PWR_0DBM:		send_text(PSTR("0"), true, false); 		break;
 		}
 		
-		send_text(PSTR("dBm)\nF2 - change LED brightness (current "), true, false);
+		if (!send_text(PSTR("dBm)\nF2 - change LED brightness (current "), true, false))		return true;
 		
 		uint8_t fcnt;
 		for (fcnt = 0; fcnt < sizeof led_brightness_lookup; ++fcnt)
@@ -352,22 +368,22 @@ bool process_menu(void)
 		if (fcnt == sizeof led_brightness_lookup)
 			itoa(get_led_brightness(), string_buff, 10);
 
-		send_text(string_buff, false, false);
+		if (!send_text(string_buff, false, false))		return true;
 		
-		send_text(PSTR(")\nF3 - lock keyboard (unlock with Func+Del+LCtrl)\n"), true, false);
-		send_text(PSTR("F4 - reset RF packet stats\nEsc - exit menu\n\n"), true, false);
+		if (!send_text(PSTR(")\nF3 - lock keyboard (unlock with Func+Del+LCtrl)\n"
+							"F4 - reset RF packet stats\n"
+							"F5 - refresh this menu\n"
+							"Esc - exit menu\n\n"), true, false))
+			return true;
 
 		do {
 			keycode = get_key_input();
-
-			// get_battery_voltage_str(string_buff);
-			// send_text(string_buff, false, false);
-			
-		} while (keycode != KC_F1  &&  keycode != KC_F2  &&  keycode != KC_F3  &&  keycode != KC_F4  &&  keycode != KC_ESC);
+		} while (!(keycode >= KC_F1  &&  keycode <= KC_F5)  &&  keycode != KC_ESC);
 
 		if (keycode == KC_F1)
 		{
-			send_text(PSTR("select power:\nF1 0dBm\nF2 -6dBm\nF3 -12dBm\nF4 -18dBm\n"), true, false);
+			if (!send_text(PSTR("select power:\nF1 0dBm\nF2 -6dBm\nF3 -12dBm\nF4 -18dBm\n"), true, false))
+				return true;
 			
 			while (1)
 			{
@@ -382,7 +398,8 @@ bool process_menu(void)
 				}
 			}
 		} else if (keycode == KC_F2) {
-			send_text(PSTR("press F1 (dim) to F12 (bright) for brightness, Esc to finish\n"), true, false);
+			if (!send_text(PSTR("press F1 (dim) to F12 (bright) for brightness, Esc to finish\n"), true, false))
+				return true;
 			
 			do {
 				keycode = get_key_input();
@@ -394,7 +411,6 @@ bool process_menu(void)
 			} while (keycode != KC_ESC);
 			
 		} else if (keycode == KC_F3) {
-		
 			send_text(PSTR("Keyboard is now LOCKED!!!\nPress Func+Del+LCtrl to unlock\n\n"), true, false);
 			return true;
 
@@ -427,8 +443,8 @@ void process_lock(void)
 		if (matrix_scan()
 				&&  get_num_keys_pressed() == 3
 				&&  is_pressed_keycode(KC_FUNC)
-				&&  is_pressed_keycode(KC_LCTRL)
-				&&  is_pressed_keycode(KC_DEL))
+				&&  (is_pressed_keycode(KC_LCTRL)  ||  is_pressed_keycode(KC_RCTRL))
+				&&  (is_pressed_keycode(KC_DEL)  ||  is_pressed_keycode(KC_KP_DOT)))
 		{
 			break;
 		}
@@ -447,7 +463,7 @@ void init_hw(void)
 	power_usart0_disable();	// init_dbg() will power on the USART if called
 	SetBit(ACSR, ACD);		// analog comparator off
 	
-	OSCCAL = 90;			// RC oscillator calibration done externally
+	OSCCAL = 103;			// RC oscillator calibration done externally.
 							// for now, just hard-code it to this value
 	
 	// default all pins to input with pullups
@@ -462,7 +478,7 @@ void init_hw(void)
 	// PE0 and PE1 are used for timing and debugging
 	// Note: these are the UART RX (PE0) and TX (PE1) pins
 	
-	//DDRE = _BV(0) | _BV(1);
+	DDRE = _BV(0) | _BV(1);
 
 	matrix_init();
 	rf_ctrl_init();
