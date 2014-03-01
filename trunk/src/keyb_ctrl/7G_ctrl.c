@@ -63,6 +63,27 @@ bool process_normal(void)
 				} else if (is_pressed_keycode(KC_L)) {
 					waiting_for_all_keys_up = true;
 					ret_val = true;
+				} else if (is_pressed_keycode(KC_KP_MINUS)) {
+
+					uint8_t curr_power = get_nrf_output_power();
+
+					if (curr_power == vRF_PWR_0DBM)
+						set_nrf_output_power(vRF_PWR_M6DBM);
+					else if (curr_power == vRF_PWR_M6DBM)
+						set_nrf_output_power(vRF_PWR_M12DBM);
+					else if (curr_power == vRF_PWR_M12DBM)
+						set_nrf_output_power(vRF_PWR_M18DBM);
+
+				} else if (is_pressed_keycode(KC_KP_PLUS)) {
+
+					uint8_t curr_power = get_nrf_output_power();
+
+					if (curr_power == vRF_PWR_M18DBM)
+						set_nrf_output_power(vRF_PWR_M12DBM);
+					else if (curr_power == vRF_PWR_M12DBM)
+						set_nrf_output_power(vRF_PWR_M6DBM);
+					else if (curr_power == vRF_PWR_M6DBM)
+						set_nrf_output_power(vRF_PWR_0DBM);
 				}
 			}
 
