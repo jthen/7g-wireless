@@ -20,7 +20,7 @@ extern const __FLASH uint8_t DongleAddr[NRF_ADDR_SIZE];
 #define MAX_KEYS		6
 
 // the nRF channel that we are communicating on
-#define CHANNEL_NUM		2
+#define CHANNEL_NUM		110
 
 // the bits in the consumer report (audio and media controls)
 #define FN_MUTE_BIT			0
