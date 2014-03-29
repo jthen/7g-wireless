@@ -1,12 +1,13 @@
 #pragma once
 
+#include "target_defs.h"
+
 // definitions for selecting and enabling nRF module
 #ifdef AVR
 # include <avr/io.h>
 # include <util/delay.h>
 # include "hw_setup.h"
 # include "utils.h"
-# define __xdata
 # define nRF_CSN_hi()		SetBit(PORT(NRF_CSN_PORT), NRF_CSN_BIT)
 # define nRF_CSN_lo()		ClrBit(PORT(NRF_CSN_PORT), NRF_CSN_BIT)
 # define nRF_CE_hi()		SetBit(PORT(NRF_CE_PORT), NRF_CE_BIT)
@@ -270,7 +271,7 @@ uint8_t nRF_WriteReg(const enum nRFRegister_e reg, const uint8_t val);
 uint8_t nRF_ReadReg(const enum nRFRegister_e reg);
 
 // read/write the address registers
-uint8_t nRF_WriteAddrReg(const enum nRFRegister_e reg, const __xdata uint8_t* addr, const uint8_t addr_len);
+uint8_t nRF_WriteAddrReg(const enum nRFRegister_e reg, const __FLASH_ATTR uint8_t* addr, const uint8_t addr_len);
 uint8_t nRF_ReadAddrReg(const enum nRFRegister_e reg, const uint8_t addr_len);
 
 // reads the RX payload (max num_bytes == 32)

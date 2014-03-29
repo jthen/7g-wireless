@@ -118,7 +118,7 @@ uint8_t nRF_WriteReg(const enum nRFRegister_e reg, const uint8_t val)
 	return nRF_ShiftCommand(2);
 }
 
-uint8_t nRF_WriteAddrReg(const enum nRFRegister_e reg, const __xdata uint8_t* addr, const uint8_t addr_len)
+uint8_t nRF_WriteAddrReg(const enum nRFRegister_e reg, const __FLASH_ATTR uint8_t* addr, const uint8_t addr_len)
 {
 	uint8_t c;
 	

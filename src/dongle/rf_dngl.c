@@ -10,13 +10,10 @@
 
 void rf_dngl_init(void)
 {
-	// set the addresses
-	__xdata uint8_t buff[5];
-
 	nRF_Init();
 
-	memcpy_P(buff, &DongleAddr, NRF_ADDR_SIZE);
-	nRF_WriteAddrReg(RX_ADDR_P0, buff, NRF_ADDR_SIZE);
+	// set the addresses
+	nRF_WriteAddrReg(RX_ADDR_P0, DongleAddr, NRF_ADDR_SIZE);
 
 #if defined(NRF_CHECK_MODULE) && defined(AVR)
 
@@ -95,17 +92,6 @@ uint8_t rf_dngl_recv(__xdata void* buff, uint8_t buff_size)
 		// reset the TX_DS
 		if (nRF_data[0] & vTX_DS)
 			nRF_WriteReg(STATUS, vTX_DS);
-
-		/*
-		uint8_t c;	// debug
-		printf("rcvd  ");
-		for (c = 0; c < ret_val; ++c)
-			printf("%02x ", ((uint8_t*)buff)[c]);
-		nRF_ReadReg(FIFO_STATUS);
-		if (!(nRF_data[1]  &  vRX_EMPTY))
-			printf("   RX NOT EMPTY!!!");
-		puts("");	// debug
-		*/
 
 		LED_off();
 	}

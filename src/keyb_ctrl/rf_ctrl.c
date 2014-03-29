@@ -27,14 +27,11 @@ void rf_ctrl_init(void)
 	nRF_Init();
 
 	// write the addresses
-	uint8_t buff[5];
-
-	memcpy_P(buff, DongleAddr, sizeof(DongleAddr));
-	nRF_WriteAddrReg(TX_ADDR, buff, 5);
+	nRF_WriteAddrReg(TX_ADDR, DongleAddr, 5);
 
 	// we need to set the RX address to the same as TX to be
 	// able to receive ACK
-	nRF_WriteAddrReg(RX_ADDR_P0, buff, 5);
+	nRF_WriteAddrReg(RX_ADDR_P0, DongleAddr, 5);
 
 #ifdef NRF_CHECK_MODULE
 
