@@ -29,7 +29,11 @@ void uartInit(void)
 	SM0 = 0;			// Mode 1..
 	SM1 = 1;			// ..8 bit variable baud rate
 	PCON |= 0x80; 		// SMOD = 1
+#ifdef NRF24LU1	
 	WDCON |= 0x80;		// Select internal baud rate generator
+#else
+	ADCON |= 0x80;		// Select internal baud rate generator
+#endif
 	temp = BAUD_57K6;
 	//temp = BAUD_38K4;
 	//temp = BAUD_9K6;
@@ -37,11 +41,15 @@ void uartInit(void)
 	S0RELL = (uint8_t)temp;
 	S0RELH = (uint8_t)(temp >> 8);
 
-	P0ALT |= 0x04;		// Select alternate functions on P01 and P02
+#ifdef NRF24LU1	
+	P0ALT |= 0x04;		// Select alternate functions on P02
 	P0EXP &= 0xfc;		// Select TxD on P02
+#else
+#endif	
+
 	//P0DIR |= 0x00;	// P01 (RxD) is input
 
-	TI0 = 1;		
+	TI0 = 1;
 	//ES0 = 1;			// Enable UART0 interrupt
 }
 
