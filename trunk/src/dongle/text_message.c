@@ -70,7 +70,7 @@ typedef struct
 #define MOD_LCTRL	0x01
 #define MOD_LSHIFT	0x02
 
-__FLASH const char2keycode_t char2keycode[0x80] = {
+__FLASH_ATTR const char2keycode_t char2keycode[0x80] = {
 	{KC_NO, 0},		// 0x00
 	{KC_A, MOD_LCTRL},		// 0x01 ctrl-a
 	{KC_HOME, MOD_LSHIFT},	// 0x02 shift-home

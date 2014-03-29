@@ -6,13 +6,13 @@
 #	include <avr/io.h>
 #	include <avr/pgmspace.h>
 #	include <util/delay.h>
-#	define __FLASH __flash
+#	define __FLASH_ATTR __flash
 #	define __xdata
 #	define LED_on()					SetBit(PORT(LED1_PORT), LED1_BIT)
 #	define LED_off()				ClrBit(PORT(LED1_PORT), LED1_BIT)
 #	define memcpy_X(dst, src, cnt)	memcpy(dst, src, cnt)
 #else
-#	define __FLASH __code
+#	define __FLASH_ATTR __code
 
 #	define LED_on()			P03 = 1
 #	define LED_off()		P03 = 0
