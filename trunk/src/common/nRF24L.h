@@ -4,21 +4,19 @@
 
 // definitions for selecting and enabling nRF module
 #ifdef AVR
-# include <avr/io.h>
-# include <util/delay.h>
-# include "hw_setup.h"
-# include "utils.h"
-# define nRF_CSN_hi()		SetBit(PORT(NRF_CSN_PORT), NRF_CSN_BIT)
-# define nRF_CSN_lo()		ClrBit(PORT(NRF_CSN_PORT), NRF_CSN_BIT)
-# define nRF_CE_hi()		SetBit(PORT(NRF_CE_PORT), NRF_CE_BIT)
-# define nRF_CE_lo()		ClrBit(PORT(NRF_CE_PORT), NRF_CE_BIT)
+#   include <avr/io.h>
+#   include <util/delay.h>
+#   include "hw_setup.h"
+#   include "utils.h"
+#   define nRF_CSN_hi()		SetBit(PORT(NRF_CSN_PORT), NRF_CSN_BIT)
+#   define nRF_CSN_lo()		ClrBit(PORT(NRF_CSN_PORT), NRF_CSN_BIT)
+#   define nRF_CE_hi()		SetBit(PORT(NRF_CE_PORT), NRF_CE_BIT)
+#   define nRF_CE_lo()		ClrBit(PORT(NRF_CE_PORT), NRF_CE_BIT)
 #else
-# include "reg24lu1.h"
-# define nRF_CSN_hi()		RFCSN = 1
-# define nRF_CSN_lo()		RFCSN = 0
-# define nRF_CE_hi()		RFCE = 1
-# define nRF_CE_lo()		RFCE = 0
-# define _BV(a)		(1 << (a))
+#   define nRF_CSN_hi()		RFCSN = 1
+#   define nRF_CSN_lo()		RFCSN = 0
+#   define nRF_CE_hi()		RFCE = 1
+#   define nRF_CE_lo()		RFCE = 0
 #endif
 
 ///////////////////////
