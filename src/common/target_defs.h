@@ -12,8 +12,15 @@
 #	define LED_off()		ClrBit(PORT(LED1_PORT), LED1_BIT)
 #	define memcpy_X(dst, src, cnt)	memcpy(dst, src, cnt)
 #else
-#	define __FLASH_ATTR __code
-
+#	ifdef NRF24LE1
+#		include "reg24le1.h"
+#	elif defined(NRF24LU1)
+#		include "reg24lu1.h"
+#	else
+#		error "Target unsupported!"
+#	endif
+#	define __FLASH_ATTR		__code
+#	define _BV(b)			(1 << (b))
 #	define LED_on()			P03 = 1
 #	define LED_off()		P03 = 0
 
