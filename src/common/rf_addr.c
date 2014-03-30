@@ -1,6 +1,6 @@
 #include <stdint.h>
 
-#include "target_defs.h"
+#include "tgtdefs.h"
 #include "rf_protocol.h"
 
 __FLASH_ATTR const uint8_t KeyBrdAddr[] = {0x63, 0x4C, 0x30, 0x10, 0x01};

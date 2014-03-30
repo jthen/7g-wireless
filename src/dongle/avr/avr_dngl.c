@@ -9,10 +9,10 @@
 #include <avr/pgmspace.h>
 #include <util/delay.h>
 
-#include "target_defs.h"
+#include "tgtdefs.h"
 #include "vusb.h"
 #include "avrdbg.h"
-#include "utils.h"
+#include "avrutils.h"
 #include "hw_setup.h"
 #include "rf_protocol.h"
 #include "rf_dngl.h"

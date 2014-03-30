@@ -8,7 +8,7 @@
 #include "sleeping.h"
 #include "matrix.h"
 #include "led.h"
-#include "utils.h"
+#include "avrutils.h"
 #include "avrdbg.h"
 
 // this is our watch

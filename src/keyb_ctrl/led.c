@@ -6,7 +6,7 @@
 
 #include "hw_setup.h"
 #include "led.h"
-#include "utils.h"
+#include "avrutils.h"
 #include "ctrl_settings.h"
 
 #define USER_BRIGHTNESS		0xff

@@ -8,7 +8,7 @@
 #include "text_message.h"
 #include "rf_dngl.h"
 
-#include "nrf_uart.h"
+#include "nrfdbg.h"
 
 hid_kbd_report_t	usb_keyboard_report;
 uint8_t				usb_consumer_report;

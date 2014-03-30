@@ -12,7 +12,7 @@
 
 #include "hw_setup.h"
 #include "avrdbg.h"
-#include "utils.h"
+#include "avrutils.h"
 #include "matrix.h"
 #include "led.h"
 #include "nRF24L.h"

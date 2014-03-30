@@ -9,12 +9,12 @@
 #include "reports.h"
 #include "rf_protocol.h"
 #include "rf_dngl.h"
-#include "nrf_utils.h"
+#include "nrfutils.h"
 
 #include "usb.h"
 #include "usb_regs.h"
 
-#include "nrf_uart.h"
+#include "nrfdbg.h"
 
 __xdata void* memcpy_X(__xdata void* dest, __xdata const void* src, size_t count)
 {

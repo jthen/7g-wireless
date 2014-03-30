@@ -10,14 +10,14 @@ FUSEH   = 0x91
 FUSEL   = 0x62
 FUSEX   = 0xff
 
-CFLAGS	= -I. -I../common -Wall -Os -flto
+CFLAGS	= -I. -I../common -I../mcu-lib -Wall -Os -flto
 #CFLAGS += -DDBGPRINT
 
 LFLAGS  = -Wl,--relax -flto
 #LFLAGS += -u vfprintf -lprintf_min
 
 # search for source files in this directory
-VPATH   = ../common
+VPATH   = ../common:../mcu-lib
 
 COMPILE = avr-gcc -mmcu=$(DEVICE) -DF_CPU=$(F_CPU) $(CFLAGS)
 

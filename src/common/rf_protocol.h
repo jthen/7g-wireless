@@ -1,6 +1,6 @@
 #pragma once
 
-#include "target_defs.h"
+#include "tgtdefs.h"
 
 enum msg_type_t
 {
