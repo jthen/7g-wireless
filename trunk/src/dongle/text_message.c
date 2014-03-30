@@ -3,7 +3,7 @@
 
 #include "keycode.h"
 #include "text_message.h"
-#include "target_defs.h"
+#include "tgtdefs.h"
 
 #define TEXT_MSG_BUFF_SIZE	128
 

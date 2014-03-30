@@ -1,6 +1,6 @@
 #pragma once
 
-#include "target_defs.h"
+#include "tgtdefs.h"
 
 void reset_keyboard_report(void);
 void process_key_state_msg(__xdata const uint8_t* recv_buffer, const uint8_t bytes_received);

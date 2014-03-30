@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "target_defs.h"
+#include "tgtdefs.h"
 #include "rf_protocol.h"
 #include "nRF24L.h"
 

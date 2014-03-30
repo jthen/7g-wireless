@@ -8,14 +8,14 @@
 #include <avr/pgmspace.h>
 #include <util/delay.h>
 
-#include "target_defs.h"
+#include "tgtdefs.h"
 #include "usbdrv.h"
 #include "vusb.h"
 #include "rf_dngl.h"
 #include "rf_protocol.h"
 #include "hw_setup.h"
 #include "reports.h"
-#include "utils.h"
+#include "avrutils.h"
 
 uint8_t vusb_idle_rate;				// in 4 ms units - set by SET_IDLE
 uint8_t vusb_idle_counter;
