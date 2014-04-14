@@ -56,7 +56,6 @@ void main()
 	LED_off();
 
 	usbInit();
-	uartInit();
 
 	rf_dngl_init();
 
@@ -65,7 +64,7 @@ void main()
 	for (;;)
 	{
 		usbPoll();	// handles USB interrupts
-		uartPoll();	// send chard from the uart TX buffer
+		//uartPoll();	// send chars from the uart TX buffer
 		
 		// try to read the recv buffer
 		bytes_received = rf_dngl_recv(recv_buffer, RECV_BUFF_SIZE);
