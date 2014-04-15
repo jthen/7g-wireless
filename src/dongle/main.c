@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include <stdio.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -56,7 +57,8 @@ void main()
 	LED_off();
 
 	usbInit();
-
+	//dbgInit();
+	
 	rf_dngl_init();
 
 	reset_keyboard_report();
@@ -64,7 +66,7 @@ void main()
 	for (;;)
 	{
 		usbPoll();	// handles USB interrupts
-		//uartPoll();	// send chars from the uart TX buffer
+		//dbgPoll();	// send chars from the uart TX buffer
 		
 		// try to read the recv buffer
 		bytes_received = rf_dngl_recv(recv_buffer, RECV_BUFF_SIZE);
