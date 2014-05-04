@@ -33,7 +33,7 @@ int	main(void)
 	_delay_ms(200);		// wait for the voltage levels to stabilize
 	
 	init_hw();
-	init_dbg();
+	dbgInit();
 	rf_dngl_init();
 	vusb_init();
 
