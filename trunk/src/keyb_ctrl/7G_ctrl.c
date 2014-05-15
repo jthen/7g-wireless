@@ -42,7 +42,7 @@ bool process_normal(void)
 
 		are_all_keys_up = true;
 		
-		if (is_pressed_keycode(KC_FUNC))
+		if (is_pressed_keycode(KC_FN0))
 		{
 			are_all_keys_up = false;
 			
@@ -457,7 +457,7 @@ void process_lock(void)
 
 		if (matrix_scan()
 				&&  get_num_keys_pressed() == 3
-				&&  is_pressed_keycode(KC_FUNC)
+				&&  is_pressed_keycode(KC_FN0)
 				&&  (is_pressed_keycode(KC_LCTRL)  ||  is_pressed_keycode(KC_RCTRL))
 				&&  (is_pressed_keycode(KC_DEL)  ||  is_pressed_keycode(KC_KP_DOT)))
 		{
