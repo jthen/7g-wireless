@@ -14,7 +14,7 @@ const __flash uint8_t matrix2keycode[NUM_ROWS][NUM_COLS] =
 	{ KC_NO,   KC_CAPS, KC_NO,   KC_LCTL, KC_NO,   KC_NO,   KC_NO,   KC_RCTL },		//  1		
 	{ KC_NO,   KC_NO,   KC_NUBS, KC_LSFT, KC_PAUS, KC_NO,   KC_NO,   KC_RSFT },		//  2
 	{ KC_1,    KC_TAB,  KC_GRV,  KC_Q,    KC_ESC,  KC_NO,   KC_A,    KC_Z    },		//  3
-	{ KC_UP,   KC_FUNC, KC_SPC,  KC_NUBS, KC_RGHT, KC_NO,   KC_NO,   KC_NO   },		//  4
+	{ KC_UP,   KC_FN0,  KC_SPC,  KC_NUBS, KC_RGHT, KC_NO,   KC_NO,   KC_NO   },		//  4
 	{ KC_LGUI, KC_NO,   KC_PENT, KC_NO,   KC_SLCK, KC_NO,   KC_NO,   KC_NO   },		//  5
 	{ KC_PSLS, KC_PAST, KC_APP,  KC_P7,   KC_PSCR, KC_PPLS, KC_P4,   KC_P1   },		//  6
 	{ KC_INS,  KC_DEL,  KC_F4,   KC_P9,   KC_F3,   KC_P3,   KC_P6,   KC_PDOT },		//  7
@@ -49,7 +49,7 @@ bool matrix_scan(void)
 	DDRD = 0xff;	PORTD = 0x00;
 	DDRA = 0xff;	PORTA = 0x00;
 
-	_delay_us(3);	// wait a little for the output levels to stabilize
+	_delay_us(3);	// wait a little for the levels to stabilize
 	
 	// first we want to know if any keys are pressed.
 	// most of the time no key will be pressed,
